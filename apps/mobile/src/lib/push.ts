@@ -19,3 +19,15 @@ export function usePushRegistration(enabled: boolean) {
     })();
   }, [enabled]);
 }
+
+/** Tapping a push opens the screen it is about (data.route). */
+export function useNotificationRouting(navigate: (route: string) => void) {
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    const sub = Notifications.addNotificationResponseReceivedListener((r) => {
+      const route = (r.notification.request.content.data as { route?: string } | undefined)?.route;
+      if (route) navigate(route);
+    });
+    return () => sub.remove();
+  }, [navigate]);
+}

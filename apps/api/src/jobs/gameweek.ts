@@ -32,6 +32,7 @@ export async function previousLockedSelection(
 
 export interface LockResult {
   gameweekId: string;
+  number: number;
   locked: number;
   carriedOver: string[];
 }
@@ -84,7 +85,7 @@ export async function lockDueGameweeks(ctx: AppContext): Promise<LockResult[]> {
         .update(gameweeks)
         .set({ status: 'locked', lockedAt: now, scoringVersion: rules.version })
         .where(eq(gameweeks.id, gw.id));
-      return { gameweekId: gw.id, locked: userIds.length, carriedOver: carried };
+      return { gameweekId: gw.id, number: gw.number, locked: userIds.length, carriedOver: carried };
     });
     if (res) results.push(res);
   }
@@ -93,6 +94,7 @@ export async function lockDueGameweeks(ctx: AppContext): Promise<LockResult[]> {
 
 export interface PollResult {
   gameweekId: string;
+  number: number;
   statsChanged: number;
   status: Gameweek['status'];
   scored: ScoredUser[];
@@ -129,7 +131,7 @@ export async function pollLiveGameweeks(ctx: AppContext): Promise<PollResult[]> 
     if (status !== gw.status) await ctx.db.update(gameweeks).set({ status }).where(eq(gameweeks.id, gw.id));
     const scored =
       changed > 0 || status !== gw.status ? await scoreGameweek(ctx, gw.id, { provisional: true }) : [];
-    out.push({ gameweekId: gw.id, statsChanged: changed, status, scored });
+    out.push({ gameweekId: gw.id, number: gw.number, statsChanged: changed, status, scored });
   }
   return out;
 }

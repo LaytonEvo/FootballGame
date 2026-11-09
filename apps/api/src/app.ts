@@ -8,6 +8,7 @@ import { authRoutes } from './routes/auth.js';
 import { cardRoutes } from './routes/cards.js';
 import { pickRoutes } from './routes/picks.js';
 import { getEconomy, getScoringConfig } from './services/config.js';
+import './services/live.js';
 
 export async function buildApp(ctx: AppContext) {
   const app = Fastify({ logger: process.env.NODE_ENV !== 'test' && !process.env.VITEST });

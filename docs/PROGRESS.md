@@ -95,6 +95,23 @@ One short note per phase. Assumptions that need a product decision are collected
   (Same as last week → Confirm).
 - Analytics: `pick_started` and `actions_confirmed` (with server-measured `pickMs`).
 
+## Phase 5 — Live matchday and notifications ✅
+
+- Home switches to live mode once a gameweek is locked: pitch with a points bubble per shirt, each action chip
+  pending / landed / missed / void (icon + colour), live score and minute on the name plate ("1–0 · 62’",
+  half-time aware), the last landed action as a banner, provisional banner until 09:00, and live mini-league
+  movement (filled in by Phase 6). The next deadline's countdown stays on Home during a live gameweek.
+- Notifications are queued in `notifications` (idempotent dedupe keys, every user switch respected and kept
+  as `suppressed = pref_off` for audit) and delivered each tick through `PushSender` (Expo push service in
+  production; in-memory in tests): deadline reminders 24h and 2h only if not confirmed; actions carried over;
+  action landed (held one minute and merged into one push per user); recap ready; card changed club /
+  inactive (grouped per batch); new pack (max one a day, extras suppressed `daily_cap`); mini-league overtaken
+  (off by default). No marketing pushes. Tapping a push opens its screen.
+- `PUT /me/notifications`, `POST /me/push-token`; switches on the Profile tab.
+- Test `test/live.test.ts` replays GW1 on a fake clock and checks every push, its timing, batching, the
+  per-user switch and the live Home payload. For staging: `pnpm --filter @ff/api replay:gameweek --gw 12`
+  drives one gameweek through every job on a fake clock against a staging database and prints the timeline.
+
 ## Assumptions to confirm
 
 | #   | Rule                                     | What the build does now                                                                                                       | Where               |

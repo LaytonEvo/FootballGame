@@ -9,6 +9,7 @@
     "worker": "tsx src/worker.ts",
     "seed": "tsx src/seed.ts",
     "dev:sync": "tsx src/dev-sync.ts",
+    "replay:gameweek": "tsx src/replay-gameweek.ts",
     "db:generate": "drizzle-kit generate",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json"

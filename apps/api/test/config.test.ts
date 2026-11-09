@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm';
 import { buildApp } from '../src/app.js';
 import { CommercialProvider } from '../src/providers/commercial.js';
 import { LocalOtpService } from '../src/services/otp.js';
+import { MemoryPushSender } from '../src/services/push.js';
 import { configVersions } from '../src/db/schema.js';
 import {
   activateConfigVersion,
@@ -59,6 +60,7 @@ describe('config seeding', () => {
       clock: t.clock,
       provider: new CommercialProvider(),
       otp: new LocalOtpService(t.db, t.clock),
+      push: new MemoryPushSender(),
     });
     const res = await app.inject({ method: 'GET', url: '/config/active' });
     expect(res.statusCode).toBe(200);

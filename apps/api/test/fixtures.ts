@@ -9,6 +9,7 @@ import { newId, sha256, shortCode } from '../src/ids.js';
 import { FplDatasetProvider } from '../src/providers/fpl-dataset.js';
 import { syncReferenceData } from '../src/services/ingest.js';
 import { LocalOtpService } from '../src/services/otp.js';
+import { MemoryPushSender } from '../src/services/push.js';
 import { testCtx } from './helpers.js';
 import type { buildApp } from '../src/app.js';
 import { hashPhone, normalisePhone } from '../src/services/phone.js';
@@ -19,11 +20,13 @@ export async function datasetCtx(gameweeks: number[], start = '2026-08-01T12:00:
   const t = await testCtx(start);
   const provider = new FplDatasetProvider({ clock: t.clock, gameweeks });
   const otp = new LocalOtpService(t.db, t.clock);
-  const ctx: AppContext & { clock: FakeClock; otp: LocalOtpService } = {
+  const push = new MemoryPushSender();
+  const ctx: AppContext & { clock: FakeClock; otp: LocalOtpService; push: MemoryPushSender } = {
     db: t.db,
     clock: t.clock,
     provider,
     otp,
+    push,
   };
   await syncReferenceData(ctx);
   return { ...t, ctx, provider };
@@ -52,6 +55,21 @@ export function findPlayers(
   });
 }
 
+/** Give an existing user cards for the given dataset elements, placed in slots 0..5 (replacing their squad). */
+export async function giveSquad(db: Db, userId: string, elements: number[], rarity: Rarity = 'gold') {
+  const refs = elements.map((e) => `fpl:p${e}`);
+  const rows = await db.select().from(players).where(inArray(players.providerRef, refs));
+  await db.delete(squadSlots).where(eq(squadSlots.userId, userId));
+  for (const [slot, ref] of refs.entries()) {
+    const p = rows.find((r) => r.providerRef === ref)!;
+    const cardId = newId();
+    await db
+      .insert(cards)
+      .values({ id: cardId, userId, playerId: p.id, rarity, rating: p.rating, clubAtOpeningId: p.clubId });
+    await db.insert(squadSlots).values({ userId, slot, cardId });
+  }
+}
+
 /** Create a user owning cards for the given dataset elements, placed in slots 0..5. */
 export async function userWithSquad(db: Db, elements: number[], rarity: Rarity = 'gold') {
   const userId = newId();
@@ -61,16 +79,7 @@ export async function userWithSquad(db: Db, elements: number[], rarity: Rarity =
     displayName: `u-${userId.slice(0, 4)}`,
     inviteCode: shortCode(8),
   });
-  const refs = elements.map((e) => `fpl:p${e}`);
-  const rows = await db.select().from(players).where(inArray(players.providerRef, refs));
-  for (const [slot, ref] of refs.entries()) {
-    const p = rows.find((r) => r.providerRef === ref)!;
-    const cardId = newId();
-    await db
-      .insert(cards)
-      .values({ id: cardId, userId, playerId: p.id, rarity, rating: p.rating, clubAtOpeningId: p.clubId });
-    await db.insert(squadSlots).values({ userId, slot, cardId });
-  }
+  await giveSquad(db, userId, elements, rarity);
   return userId;
 }
 

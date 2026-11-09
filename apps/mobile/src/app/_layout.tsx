@@ -11,12 +11,15 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AuthProvider, useAuth } from '../lib/auth';
 import { Loading } from '../components/ui';
-import { usePushRegistration } from '../lib/push';
+import { useNotificationRouting, usePushRegistration } from '../lib/push';
+
+const navigateTo = (route: string) => router.push(route as never);
 
 function Gate() {
   const { ready, me } = useAuth();
   const segments = useSegments();
   usePushRegistration(!!me?.profileComplete);
+  useNotificationRouting(navigateTo);
   useEffect(() => {
     if (!ready) return;
     const first = segments[0] as string | undefined;

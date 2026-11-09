@@ -8,6 +8,7 @@ import { cards, clubs, packs, players, squadSlots } from '../db/schema.js';
 import { badRequest, conflict, notFound } from '../errors.js';
 import { newId } from '../ids.js';
 import { getPacksConfig } from './config.js';
+import { notify } from './notifications.js';
 
 export type PackType = (typeof packs.$inferSelect)['type'];
 export type PackSource = (typeof packs.$inferSelect)['source'];
@@ -40,7 +41,22 @@ export async function grantPack(
     .values({ id: newId(), userId, type, source, grantKey, rarity, grantedAt: at })
     .onConflictDoNothing({ target: packs.grantKey })
     .returning();
-  if (inserted[0]) return { pack: inserted[0], created: true };
+  if (inserted[0]) {
+    if (source === 'milestone' || source === 'compensation' || source === 'admin') {
+      await notify(db, at, {
+        userId,
+        kind: 'new_pack',
+        title: 'New pack ready',
+        body:
+          source === 'milestone'
+            ? 'You reached a season milestone. Open your pack.'
+            : 'A free pack is waiting in your collection.',
+        data: { route: `/pack/${inserted[0].id}` },
+        dedupeKey: `newpack:${inserted[0].id}`,
+      });
+    }
+    return { pack: inserted[0], created: true };
+  }
   const [existing] = await db.select().from(packs).where(eq(packs.grantKey, grantKey));
   return { pack: existing!, created: false };
 }
