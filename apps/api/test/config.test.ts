@@ -2,6 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { eq } from 'drizzle-orm';
 import { buildApp } from '../src/app.js';
 import { CommercialProvider } from '../src/providers/commercial.js';
+import { LocalOtpService } from '../src/services/otp.js';
 import { configVersions } from '../src/db/schema.js';
 import {
   activateConfigVersion,
@@ -53,7 +54,12 @@ describe('config seeding', () => {
   });
 
   it('serves the active config over HTTP', async () => {
-    const app = await buildApp({ db: t.db, clock: t.clock, provider: new CommercialProvider() });
+    const app = await buildApp({
+      db: t.db,
+      clock: t.clock,
+      provider: new CommercialProvider(),
+      otp: new LocalOtpService(t.db, t.clock),
+    });
     const res = await app.inject({ method: 'GET', url: '/config/active' });
     expect(res.statusCode).toBe(200);
     expect(res.json().economy.prices_coins.player_pack).toBe(100);

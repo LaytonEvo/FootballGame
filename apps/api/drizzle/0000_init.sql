@@ -171,13 +171,15 @@ CREATE TABLE "player_match_stats" (
 --> statement-breakpoint
 CREATE TABLE "player_moves" (
 	"id" text PRIMARY KEY NOT NULL,
+	"ref" text NOT NULL,
 	"player_id" text NOT NULL,
 	"kind" text NOT NULL,
 	"to_club_id" text,
 	"registered_at" timestamp with time zone NOT NULL,
 	"effective_gameweek_id" text,
 	"processed_at" timestamp with time zone,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "player_moves_ref_unique" UNIQUE("ref")
 );
 --> statement-breakpoint
 CREATE TABLE "players" (

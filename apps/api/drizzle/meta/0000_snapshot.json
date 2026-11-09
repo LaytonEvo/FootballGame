@@ -1,5 +1,5 @@
 {
-  "id": "9be769a8-fe80-4daf-85ef-59d107602b9b",
+  "id": "d2c20e00-520d-403d-9723-7522a2c1be82",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1326,6 +1326,12 @@
           "primaryKey": true,
           "notNull": true
         },
+        "ref": {
+          "name": "ref",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "player_id": {
           "name": "player_id",
           "type": "text",
@@ -1401,7 +1407,13 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "player_moves_ref_unique": {
+          "name": "player_moves_ref_unique",
+          "nullsNotDistinct": false,
+          "columns": ["ref"]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

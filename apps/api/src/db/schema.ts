@@ -319,10 +319,12 @@ export const leagueMembers = pgTable(
 
 export const playerMoves = pgTable('player_moves', {
   id: id(),
+  /** Provider reference (or "admin:<uuid>") — makes ingestion idempotent. */
+  ref: text('ref').notNull().unique(),
   playerId: text('player_id')
     .notNull()
     .references(() => players.id),
-  kind: text('kind', { enum: ['transfer', 'left_league', 'retired', 'returned', 'relegated'] }).notNull(),
+  kind: text('kind', { enum: ['transfer', 'left_league', 'retired', 'returned'] }).notNull(),
   toClubId: text('to_club_id').references(() => clubs.id),
   registeredAt: ts('registered_at').notNull(),
   /** Takes effect from the first deadline after registration. */

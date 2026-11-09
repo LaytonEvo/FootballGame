@@ -57,6 +57,23 @@ One short note per phase. Assumptions that need a product decision are collected
 - New config file `config/packs.v0.1.json` (rarity rating bands, squad rating cap 440, pack odds) loaded as a
   third versioned config kind. Odds are working values for the test.
 
+## Phase 3 — Accounts, cards and squads ✅
+
+- Phone sign-in with one-time code: `OtpService` with `TwilioVerifyOtpService` (production, env credentials) and
+  `LocalOtpService` (dev/test: code hashed in `otp_challenges`, 10-minute expiry, 5 attempts). Phone numbers
+  are normalised to E.164 and stored only as an HMAC (`PHONE_HASH_SECRET`). Bearer-token sessions (hashed).
+- Profile: display name, favourite club (content only), 16+ confirmation and disclaimer acceptance are all
+  required before any game endpoint (403 `profile_incomplete`). Completing it grants the starter pack once.
+- Cards: player, rarity, rating, level, club at opening, active/inactive. Packs are granted sealed (idempotent
+  `grant_key`), opened only on request; the server draws with a logged seed and odds version
+  (`planPack` is pure, so any opening can be reproduced). Starter: five in squad shape, one tier, one stronger
+  card, ≤2 per club, auto-placed. Player, squad, swap and milestone packs implemented. Duplicates level up.
+- Squad: shape, ≤2 per club, squad rating cap (config), owned and active cards only. Sub optional.
+- Moves: provider transfers are recorded with the first deadline after registration and applied at that
+  deadline (before locking). Transfer → card follows the player. Left league / retired → card inactive, out of
+  the squad (auto-filled from the collection where possible), free same-rarity swap pack. Returned → reactivated
+  (owner keeps the swap pack). `relegateClub` / `promoteClub` for season end.
+
 ## Assumptions to confirm
 
 | #   | Rule                                     | What the build does now                                                                                                       | Where               |

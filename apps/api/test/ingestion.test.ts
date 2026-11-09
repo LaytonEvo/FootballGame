@@ -70,15 +70,13 @@ describe('gameweek ingestion and lifecycle', () => {
     );
     squad.sub!.actions = ['plays_90'];
     squad.captain = 4;
-    await t.db
-      .insert(selections)
-      .values({
-        userId: confirmed,
-        gameweekId: gw!.id,
-        body: squad,
-        confirmedAt: t.clock.now(),
-        updatedAt: t.clock.now(),
-      });
+    await t.db.insert(selections).values({
+      userId: confirmed,
+      gameweekId: gw!.id,
+      body: squad,
+      confirmedAt: t.clock.now(),
+      updatedAt: t.clock.now(),
+    });
 
     // Before the deadline nothing locks.
     t.clock.set(new Date(gw!.deadlineAt.getTime() - MINUTE));
