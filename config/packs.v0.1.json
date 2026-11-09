@@ -1,0 +1,24 @@
+{
+  "version": "0.1",
+  "status": "working values for the closed test; odds are shown on every pack and logged with each opening",
+  "rating": {
+    "comment": "Card rating 40-99. Dev mapping from the FPL dataset price (tenths of £m): rating = 48 + 0.9 × (price − 40), capped at 99.",
+    "rarity_bands": { "bronze": [40, 59], "silver": [60, 71], "gold": [72, 81], "elite": [82, 99] }
+  },
+  "squad_rating_cap": 440,
+  "odds": {
+    "player": { "bronze": 0.6, "silver": 0.28, "gold": 0.1, "elite": 0.02 },
+    "silver": { "silver": 0.85, "gold": 0.13, "elite": 0.02 },
+    "gold": { "gold": 0.9, "elite": 0.1 },
+    "elite": { "elite": 1 },
+    "squad": { "bronze": 0.55, "silver": 0.3, "gold": 0.12, "elite": 0.03 }
+  },
+  "starter": {
+    "comment": "Five players in squad shape, all from one tier, one guaranteed stronger card (one tier up).",
+    "base_tier": "bronze",
+    "stronger_tier": "silver"
+  },
+  "swap": {
+    "comment": "Swap and compensation packs: one player of the same rarity as the card replaced, any position."
+  }
+}

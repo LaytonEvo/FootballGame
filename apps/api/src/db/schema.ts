@@ -24,7 +24,7 @@ export const configVersions = pgTable(
   'config_versions',
   {
     id: id(),
-    kind: text('kind', { enum: ['scoring', 'economy'] }).notNull(),
+    kind: text('kind', { enum: ['scoring', 'economy', 'packs'] }).notNull(),
     version: text('version').notNull(),
     season: text('season').notNull(),
     body: jsonb('body').notNull(),

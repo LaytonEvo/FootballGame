@@ -36,16 +36,37 @@ One short note per phase. Assumptions that need a product decision are collected
   200/400/550/750. Elite-vs-Bronze gap is 1.18× (spec says ≈1.10×). Config files are **not** changed until the
   product owner decides.
 
+## Phase 2 — Data ingestion ✅
+
+- `DataProvider` interface (`clubs`, `squads`, `fixtures`, `liveMatchStats`, `finalMatchStats`, `transfers`) with
+  `FplDatasetProvider` (replays 2025/26 shifted +364 days against the server clock: scheduled → live with
+  stats revealed over the match → finished; tests can postpone/abandon fixtures and revise stats) and a
+  `CommercialProvider` stub that fails loudly. `DATA_PROVIDER=commercial` selects it.
+- `syncReferenceData`: upserts clubs, players, fixtures; creates gameweeks with deadline = first kick-off − 90 min
+  and finalisation = 09:00 Europe/London the morning after the last kick-off (DST-safe, tested).
+- Jobs (all idempotent, all on the server clock, run together by `tick()`; `worker.ts` schedules it every minute
+  via BullMQ when `REDIS_URL` is set, else an in-process loop):
+  - `lockDueGameweeks`: fixes the scoring version, snapshots each squad, carries last week's actions over for
+    anyone who didn't confirm (Auto-pick fills gaps).
+  - `pollLiveGameweeks`: refreshes fixtures, ingests live/final stats (each change bumps a revision and is
+    logged in `stat_revisions`), re-scores provisionally from raw stats.
+  - `finaliseDueGameweeks`: final pull at 09:00, final scores, status `finalised`. Later revisions are logged
+    with `applied = false` and never change scores.
+- Postponed/abandoned (or staff-voided) fixtures void the affected players' actions; blank and double gameweeks
+  come straight from the real fixture list (GW26 double, GW31 blank) and are tested end to end.
+- New config file `config/packs.v0.1.json` (rarity rating bands, squad rating cap 440, pack odds) loaded as a
+  third versioned config kind. Odds are working values for the test.
+
 ## Assumptions to confirm
 
-| # | Rule | What the build does now | Where |
-| --- | --- | --- | --- |
-| A1 | Captain on a starter who plays 0 minutes | Captaincy is lost (no vice-captain); the sub scores its own actions without ×2 | `scoreSquad` |
-| A2 | Bold-miss penalty and multipliers | Penalty = −ceil(base × 50%), not scaled by rarity or captain | `scoreSquad` |
-| A3 | Rounding | Per action line, half away from zero, so the breakdown always sums to the total | `scoreSquad` |
-| A4 | Double gameweek "combined stats" | Thresholds use summed stats (so "Plays 90" lands on 45+45; clean sheet lands if either match is one) — same as the Python sim | `aggregate` |
-| A5 | Postponed after lock | Player's actions void; the sub may come in (treated like 0 minutes) | `scoreSquad` |
-| A6 | Two starters out | Only one sub; it comes in once any starter is out | `scoreSquad` |
-| A7 | Chaos cap scope | "Max one per squad" counts the sub's actions too | `validateSelection` |
-| A8 | Overlap | Follows config groups exactly: `assist` + `goal_involvement` is allowed (different groups) | config |
-| A9 | Negative weeks | Season Points can go negative (bold misses); Coins earned are floored at 0 per week | ledger |
+| #   | Rule                                     | What the build does now                                                                                                       | Where               |
+| --- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| A1  | Captain on a starter who plays 0 minutes | Captaincy is lost (no vice-captain); the sub scores its own actions without ×2                                                | `scoreSquad`        |
+| A2  | Bold-miss penalty and multipliers        | Penalty = −ceil(base × 50%), not scaled by rarity or captain                                                                  | `scoreSquad`        |
+| A3  | Rounding                                 | Per action line, half away from zero, so the breakdown always sums to the total                                               | `scoreSquad`        |
+| A4  | Double gameweek "combined stats"         | Thresholds use summed stats (so "Plays 90" lands on 45+45; clean sheet lands if either match is one) — same as the Python sim | `aggregate`         |
+| A5  | Postponed after lock                     | Player's actions void; the sub may come in (treated like 0 minutes)                                                           | `scoreSquad`        |
+| A6  | Two starters out                         | Only one sub; it comes in once any starter is out                                                                             | `scoreSquad`        |
+| A7  | Chaos cap scope                          | "Max one per squad" counts the sub's actions too                                                                              | `validateSelection` |
+| A8  | Overlap                                  | Follows config groups exactly: `assist` + `goal_involvement` is allowed (different groups)                                    | config              |
+| A9  | Negative weeks                           | Season Points can go negative (bold misses); Coins earned are floored at 0 per week                                           | ledger              |

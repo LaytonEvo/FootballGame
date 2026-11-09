@@ -107,3 +107,46 @@ export function parseEconomyConfig(raw: unknown): EconomyConfig {
     throw new Error('Milestones must be strictly increasing');
   return cfg;
 }
+
+const rarityOdds = z.partialRecord(z.enum(RARITIES), z.number().min(0).max(1));
+
+export const packsConfigSchema = z.object({
+  version: z.string(),
+  status: z.string().optional(),
+  rating: z.object({
+    comment: z.string().optional(),
+    rarity_bands: z.record(z.enum(RARITIES), z.tuple([z.number().int(), z.number().int()])),
+  }),
+  squad_rating_cap: z.number().int().positive(),
+  odds: z.object({
+    player: rarityOdds,
+    silver: rarityOdds,
+    gold: rarityOdds,
+    elite: rarityOdds,
+    squad: rarityOdds,
+  }),
+  starter: z.object({
+    comment: z.string().optional(),
+    base_tier: z.enum(RARITIES),
+    stronger_tier: z.enum(RARITIES),
+  }),
+  swap: z.record(z.string(), z.string()).optional(),
+});
+export type PacksConfig = z.infer<typeof packsConfigSchema>;
+
+export function parsePacksConfig(raw: unknown): PacksConfig {
+  const cfg = packsConfigSchema.parse(raw);
+  for (const [k, odds] of Object.entries(cfg.odds)) {
+    const sum = Object.values(odds).reduce((s, x) => s + (x ?? 0), 0);
+    if (Math.abs(sum - 1) > 1e-9) throw new Error(`Pack odds for ${k} sum to ${sum}, not 1`);
+  }
+  return cfg;
+}
+
+export function rarityForRating(cfg: PacksConfig, rating: number) {
+  for (const r of RARITIES) {
+    const [lo, hi] = cfg.rating.rarity_bands[r];
+    if (rating >= lo && rating <= hi) return r;
+  }
+  throw new Error(`Rating ${rating} outside every rarity band`);
+}

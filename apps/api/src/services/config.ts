@@ -1,12 +1,19 @@
 import { readFileSync } from 'node:fs';
 import { and, eq } from 'drizzle-orm';
-import type { EconomyConfig, ScoringConfig } from '@ff/shared';
-import { parseEconomyConfig, parseScoringConfig } from '@ff/shared';
+import type { EconomyConfig, PacksConfig, ScoringConfig } from '@ff/shared';
+import { parseEconomyConfig, parsePacksConfig, parseScoringConfig } from '@ff/shared';
 import type { RuleSet } from '@ff/scoring';
 import { compileRules } from '@ff/scoring';
 import type { DbOrTx } from '../db/client.js';
 import { configVersions } from '../db/schema.js';
 import { newId } from '../ids.js';
+
+export type ConfigKind = 'scoring' | 'economy' | 'packs';
+const PARSERS: Record<ConfigKind, (raw: unknown) => { version: string }> = {
+  scoring: parseScoringConfig,
+  economy: parseEconomyConfig,
+  packs: parsePacksConfig,
+};
 
 export const SEASON = process.env.SEASON ?? '2026-27-test';
 const CONFIG_DIR = new URL('../../../../config/', import.meta.url);
@@ -18,12 +25,12 @@ export function readConfigFile(name: string): unknown {
 /** Insert a config version (idempotent). Activates it if `activate` or if nothing is active yet. */
 export async function upsertConfigVersion(
   db: DbOrTx,
-  kind: 'scoring' | 'economy',
+  kind: ConfigKind,
   raw: unknown,
   opts: { season?: string; activate?: boolean } = {},
 ) {
   const season = opts.season ?? SEASON;
-  const parsed = kind === 'scoring' ? parseScoringConfig(raw) : parseEconomyConfig(raw);
+  const parsed = PARSERS[kind](raw);
   const existing = await db
     .select()
     .from(configVersions)
@@ -52,12 +59,7 @@ export async function upsertConfigVersion(
   return row;
 }
 
-export async function activateConfigVersion(
-  db: DbOrTx,
-  kind: 'scoring' | 'economy',
-  version: string,
-  season = SEASON,
-) {
+export async function activateConfigVersion(db: DbOrTx, kind: ConfigKind, version: string, season = SEASON) {
   const target = await db
     .select()
     .from(configVersions)
@@ -111,22 +113,27 @@ export async function getRules(db: DbOrTx, version?: string, season = SEASON): P
   return rules;
 }
 
-export async function getEconomy(db: DbOrTx, season = SEASON): Promise<EconomyConfig> {
+async function activeBody(db: DbOrTx, kind: ConfigKind, season: string) {
   const [row] = await db
     .select()
     .from(configVersions)
     .where(
-      and(
-        eq(configVersions.kind, 'economy'),
-        eq(configVersions.season, season),
-        eq(configVersions.active, true),
-      ),
+      and(eq(configVersions.kind, kind), eq(configVersions.season, season), eq(configVersions.active, true)),
     );
-  if (!row) throw new Error(`No active economy config for ${season}`);
-  return parseEconomyConfig(row.body);
+  if (!row) throw new Error(`No active ${kind} config for ${season}`);
+  return row.body;
+}
+
+export async function getEconomy(db: DbOrTx, season = SEASON): Promise<EconomyConfig> {
+  return parseEconomyConfig(await activeBody(db, 'economy', season));
+}
+
+export async function getPacksConfig(db: DbOrTx, season = SEASON): Promise<PacksConfig> {
+  return parsePacksConfig(await activeBody(db, 'packs', season));
 }
 
 export async function seedConfigs(db: DbOrTx) {
   await upsertConfigVersion(db, 'scoring', readConfigFile('scoring.v0.2.json'));
   await upsertConfigVersion(db, 'economy', readConfigFile('economy.v0.1.json'));
+  await upsertConfigVersion(db, 'packs', readConfigFile('packs.v0.1.json'));
 }

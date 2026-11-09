@@ -23,3 +23,13 @@ describe('config files', () => {
     expect(() => parseScoringConfig(bad)).toThrow(/Duplicate/);
   });
 });
+
+describe('packs config', () => {
+  const packs = JSON.parse(readFileSync(new URL('packs.v0.1.json', root), 'utf8'));
+  it('parses and odds sum to 1', async () => {
+    const { parsePacksConfig, rarityForRating } = await import('../src/index.js');
+    const cfg = parsePacksConfig(packs);
+    expect(rarityForRating(cfg, 59)).toBe('bronze');
+    expect(rarityForRating(cfg, 82)).toBe('elite');
+  });
+});

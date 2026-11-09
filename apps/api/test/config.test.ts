@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { eq } from 'drizzle-orm';
 import { buildApp } from '../src/app.js';
+import { CommercialProvider } from '../src/providers/commercial.js';
 import { configVersions } from '../src/db/schema.js';
 import {
   activateConfigVersion,
@@ -22,13 +23,14 @@ describe('config seeding', () => {
     const rows = await t.db.select().from(configVersions);
     expect(rows.map((r) => `${r.kind}:${r.version}:${r.active}`).sort()).toEqual([
       'economy:0.1:true',
+      'packs:0.1:true',
       'scoring:0.2:true',
     ]);
   });
 
   it('is idempotent', async () => {
     await seedConfigs(t.db);
-    expect(await t.db.select().from(configVersions)).toHaveLength(2);
+    expect(await t.db.select().from(configVersions)).toHaveLength(3);
   });
 
   it('switches versions without a release', async () => {
@@ -47,11 +49,11 @@ describe('config seeding', () => {
     expect((await getRules(t.db, '0.2')).byPosition.FWD.get('goal')!.points).toBe(5);
     await activateConfigVersion(t.db, 'scoring', '0.2');
     const active = await t.db.select().from(configVersions).where(eq(configVersions.active, true));
-    expect(active).toHaveLength(2);
+    expect(active).toHaveLength(3);
   });
 
   it('serves the active config over HTTP', async () => {
-    const app = await buildApp({ db: t.db, clock: t.clock });
+    const app = await buildApp({ db: t.db, clock: t.clock, provider: new CommercialProvider() });
     const res = await app.inject({ method: 'GET', url: '/config/active' });
     expect(res.statusCode).toBe(200);
     expect(res.json().economy.prices_coins.player_pack).toBe(100);
