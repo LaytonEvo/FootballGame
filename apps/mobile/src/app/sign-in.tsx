@@ -62,10 +62,10 @@ export default function SignIn() {
           onChangeText={setPhone}
           accessibilityLabel="Mobile number"
         />
-        <Small>We text you a one-time code. No passwords.</Small>
+        <Small>We may text you a one-time code. No passwords.</Small>
         <ErrorText>{err}</ErrorText>
         <Button
-          title="Send code"
+          title="Continue"
           onPress={send}
           loading={busy}
           disabled={phone.replace(/\D/g, '').length < 9}
