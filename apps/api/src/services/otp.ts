@@ -87,3 +87,20 @@ export class TwilioVerifyOtpService implements OtpService {
     return (await this.post('VerificationCheck', { To: phone, Code: code })).status === 'approved';
   }
 }
+
+/**
+ * Testing only: no SMS is sent and one fixed code signs in any number. The code is returned by /auth/start
+ * so the app can fill it in. Enabled by OTP_BYPASS_CODE; anyone who knows a tester's number can sign in as
+ * them, so never enable it once real players are on the build.
+ */
+export class BypassOtpService implements OtpService {
+  readonly testCode: string;
+  constructor(code: string) {
+    if (!/^\d{4,8}$/.test(code)) throw new Error('OTP_BYPASS_CODE must be 4-8 digits');
+    this.testCode = code;
+  }
+  async start() {}
+  async check(_phone: string, _hash: string, code: string) {
+    return code === this.testCode;
+  }
+}

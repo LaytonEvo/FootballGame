@@ -3,6 +3,7 @@ import { TextInput, View } from 'react-native';
 import { router } from 'expo-router';
 import { DISCLAIMER } from '@ff/shared';
 import { api } from '../lib/api';
+import { useAuth } from '../lib/auth';
 import { color, font, radius, type } from '../lib/theme';
 import { Body, Button, ErrorText, H1, Screen, Small } from '../components/ui';
 import { Gradient } from '../components/Gradient';
@@ -20,6 +21,7 @@ export const inputStyle = {
 } as const;
 
 export default function SignIn() {
+  const { signIn } = useAuth();
   const [phone, setPhone] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -27,7 +29,13 @@ export default function SignIn() {
     setBusy(true);
     setErr(null);
     try {
-      await api('/auth/start', { body: { phone } });
+      const r = await api<{ sent: boolean; testCode?: string }>('/auth/start', { body: { phone } });
+      if (r.testCode) {
+        // Test build with SMS bypassed: sign straight in with the code the server handed back.
+        const v = await api<{ token: string }>('/auth/verify', { body: { phone, code: r.testCode } });
+        await signIn(v.token);
+        return;
+      }
       router.push({ pathname: '/verify', params: { phone } });
     } catch (e) {
       setErr((e as Error).message);

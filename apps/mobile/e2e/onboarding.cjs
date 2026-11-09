@@ -16,7 +16,7 @@ const OUT = process.argv[3] ?? SP + '/shots';
   await p.goto('http://localhost:8082/');
   await p.getByLabel('Mobile number').fill('07700 9' + String(Date.now()).slice(-5) + '');
   await shot('01-signin');
-  await p.getByText('Send code').click();
+  await p.getByRole('button', { name: 'Continue' }).click();
   await p.waitForTimeout(1500);
   const log = fs.readFileSync(`${SP}/api.log`, 'utf8');
   const code = [...log.matchAll(/one-time code for [^:]+: (\d{6})/g)].pop()[1];

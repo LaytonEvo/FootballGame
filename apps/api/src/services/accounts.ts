@@ -20,7 +20,9 @@ export async function startSignIn(ctx: AppContext, rawPhone: string) {
   const phoneHash = hashPhone(phone);
   await ctx.otp.start(phone, phoneHash);
   await track(ctx.db, ctx.clock.now(), null, 'signup_started', {});
-  return { sent: true };
+  // Test builds with SMS bypassed: hand the code back so the app signs straight in.
+  const testCode = 'testCode' in ctx.otp ? (ctx.otp.testCode as string) : undefined;
+  return testCode ? { sent: false, testCode } : { sent: true };
 }
 
 export async function verifySignIn(ctx: AppContext, rawPhone: string, code: string) {
