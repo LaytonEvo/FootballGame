@@ -9,6 +9,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { router, useLocalSearchParams } from 'expo-router';
 import { api } from '../../lib/api';
+import { pendingInvite } from '../../lib/invite';
 import { useApi } from '../../lib/useApi';
 import type { PackStage } from '../../lib/motion';
 import { PACK_MOTION, packTimeline } from '../../lib/motion';
@@ -106,6 +107,22 @@ export default function PackScreen() {
     }
   };
 
+  // Invite opened before sign-up: land in that league after the starter pack.
+  const afterOnboardingPack = async () => {
+    const code = await pendingInvite.get();
+    if (code) {
+      try {
+        const l = await api<{ id: string }>('/leagues/join', { body: { code } });
+        await pendingInvite.set(null);
+        router.replace({ pathname: '/league/[id]', params: { id: l.id, fromInvite: '1' } });
+        return;
+      } catch {
+        await pendingInvite.set(null);
+      }
+    }
+    router.replace({ pathname: '/picks', params: { guided: '1' } });
+  };
+
   const opened = stage !== 'sealed' && stage !== 'shake';
   const single = cards?.length === 1 ? cards[0]! : null;
   const glow = single ? rarityColor(single.rarity) : color.accent;
@@ -195,10 +212,7 @@ export default function PackScreen() {
             </Text>
           ) : null}
           {onboarding ? (
-            <Button
-              title="Pick your actions"
-              onPress={() => router.replace({ pathname: '/picks', params: { guided: '1' } })}
-            />
+            <Button title="Pick your actions" onPress={afterOnboardingPack} />
           ) : single && !single.duplicate ? (
             <>
               {(SLOT_FOR[single.position] ?? []).concat(5).map((slot) => (

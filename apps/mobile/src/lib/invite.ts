@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { Platform, Share } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 
 const KEY = 'ff.pendingInvite';
@@ -15,3 +15,6 @@ export const pendingInvite = {
     return code ? SecureStore.setItemAsync(KEY, code) : SecureStore.deleteItemAsync(KEY);
   },
 };
+
+export const shareInvite = (l: { name: string; url: string; code: string }) =>
+  Share.share({ message: `Join my Fantasy Five mini-league "${l.name}": ${l.url} (code ${l.code})` });

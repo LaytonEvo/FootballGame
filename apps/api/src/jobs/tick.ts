@@ -10,6 +10,7 @@ import { ingestMoves, processDueMoves } from '../services/moves.js';
 import { deliverNotifications, queueDeadlineReminders } from '../services/notifications.js';
 import { finaliseDueGameweeks, lockDueGameweeks, pollLiveGameweeks } from './gameweek.js';
 import { afterFinalise } from './hooks.js';
+import '../services/leagues-hooks.js';
 
 /**
  * One idempotent pass of every scheduled job, driven by the server clock. The worker runs it every minute;

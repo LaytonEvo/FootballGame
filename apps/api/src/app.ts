@@ -9,6 +9,8 @@ import { cardRoutes } from './routes/cards.js';
 import { pickRoutes } from './routes/picks.js';
 import { getEconomy, getScoringConfig } from './services/config.js';
 import './services/live.js';
+import './services/leagues-hooks.js';
+import { leagueRoutes } from './routes/leagues.js';
 
 export async function buildApp(ctx: AppContext) {
   const app = Fastify({ logger: process.env.NODE_ENV !== 'test' && !process.env.VITEST });
@@ -34,5 +36,6 @@ export async function buildApp(ctx: AppContext) {
   authRoutes(app, ctx);
   cardRoutes(app, ctx);
   pickRoutes(app, ctx);
+  leagueRoutes(app, ctx);
   return app;
 }

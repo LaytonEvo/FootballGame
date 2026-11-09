@@ -112,6 +112,23 @@ One short note per phase. Assumptions that need a product decision are collected
   per-user switch and the live Home payload. For staging: `pnpm --filter @ff/api replay:gameweek --gw 12`
   drives one gameweek through every job on a fake clock against a staging database and prints the timeline.
 
+## Phase 6 — Leagues ✅
+
+- Tables are computed from `gameweek_scores` (provisional included, so they move live): Global (season,
+  month `?view=month&month=2026-10`, week), private mini-leagues (Season / This week). Ranking: points, then
+  most actions landed, then fewest actions picked; exact ties share a rank (unit-tested). Movement arrows
+  compare with the table before the latest gameweek.
+- Mini-leagues: create → invite code + `https://…/join/CODE` and `fantasyfive://join/CODE` links → public
+  preview `GET /invites/:code` → join (idempotent, case-insensitive) → leave. Non-members get 403.
+- Deep link: `/join/[code]` stores the code; after onboarding's starter pack the player lands in that league
+  (with a "Pick your actions" card). Analytics: `league_created`, `invite_link_opened`, `league_joined`,
+  `invite_accepted`.
+- Home league card (rank, size, gap to the place above) and live mini-league movement during matches;
+  "Overtaken in a mini-league" push after finalisation (off by default).
+- "My season" (`GET /me/season`): total, average, best week, bars per gameweek with league-average marks,
+  last three weeks.
+- Test: create, invite by link, join, replay GW1 and GW2, tables match the stored scores, arrows correct.
+
 ## Assumptions to confirm
 
 | #   | Rule                                     | What the build does now                                                                                                       | Where               |

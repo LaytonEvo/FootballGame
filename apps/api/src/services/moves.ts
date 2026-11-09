@@ -1,4 +1,4 @@
-import { and, asc, eq, gt, inArray, isNull, lte } from 'drizzle-orm';
+import { and, asc, eq, gt, inArray, isNull } from 'drizzle-orm';
 import type { AppContext } from '../context.js';
 import type { DbOrTx } from '../db/client.js';
 import { cards, clubs, gameweeks, playerMoves, players, squadSlots } from '../db/schema.js';
@@ -192,5 +192,3 @@ export async function relegateClub(ctx: AppContext, clubId: string): Promise<Car
 export async function promoteClub(ctx: AppContext, clubId: string) {
   await ctx.db.update(clubs).set({ inLeague: true }).where(eq(clubs.id, clubId));
 }
-
-export { lte };

@@ -1,4 +1,4 @@
-import { and, eq, inArray } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import type { PlayerMatchStats } from '@ff/shared';
 import type { AppContext } from '../context.js';
 import type { DbOrTx } from '../db/client.js';
@@ -162,5 +162,3 @@ export function statsForSelection(
   }
   return out;
 }
-
-export { and };
