@@ -161,6 +161,30 @@ One short note per phase. Assumptions that need a product decision are collected
   native share sheet (WhatsApp first on most devices); logs `recap_shared`.
 - Test: a finalised gameweek yields a recap and both images (dimensions checked) for every user.
 
+## Phase 9 — Admin console ✅
+
+- Staff API under `/admin/*` (bearer tokens from `STAFF_TOKENS`, constant-time compare), every write audited:
+  void / postpone a match (re-scores at once, refused after finalisation), re-score a gameweek, record
+  transfers / leaving / retirement / returns and apply due moves, relegate / promote clubs, edit player and
+  card ratings, upload (schema-validated) and activate scoring / economy / packs config versions, pack-open
+  log with seeds and odds versions, user lookup (name, invite code, phone by hash), ledger with reconciliation
+  check, scoring breakdown per gameweek, Coins adjustment, GDPR erasure.
+- `apps/admin`: React console over that API (Gameweeks & matches, Players & transfers, Clubs, Users & ledger,
+  Pack log, Points & economy, Audit). Checked in a headless browser against the dev API.
+- `docs/ADMIN.md` maps every edge case in the spec to "automatic" or the exact console action.
+- Test: auth required; every action exercised end to end with audit rows.
+
+## Before the closed test (not code)
+
+- Product decisions: game name, chaos actions at launch, milestone levels (economy check proposes
+  200/400/550/750), whether to widen rarity multipliers, the assumptions below.
+- Commercial data contract → implement `CommercialProvider` against the same interface.
+- Twilio Verify, Expo push credentials, Railway (Postgres, Redis, API, worker), `PHONE_HASH_SECRET`.
+- Usability run for the "< 60 s returning player" and "< 2 min to first lock" targets on real devices;
+  analytics events are in place (`analytics_events`).
+- Privacy notice text review (in-app copy in `apps/mobile/src/app/privacy.tsx`).
+- EAS builds for TestFlight / Play internal testing (invite-only, 200–500 testers).
+
 ## Assumptions to confirm
 
 | #   | Rule                                     | What the build does now                                                                                                       | Where               |

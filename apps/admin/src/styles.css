@@ -1,0 +1,130 @@
+:root {
+  --bg: #f4f6fa;
+  --surface: #fff;
+  --border: #e3e7ef;
+  --ink: #10153a;
+  --muted: #5a6178;
+  --active: #3d5afe;
+  --missed: #c2410c;
+  --landed: #046c61;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+}
+body {
+  margin: 0;
+}
+header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 12px 20px;
+  background: var(--ink);
+  color: #fff;
+  flex-wrap: wrap;
+}
+header h1 {
+  font-size: 18px;
+  margin: 0 16px 0 0;
+}
+header button {
+  background: transparent;
+  color: #cfd6ff;
+  border: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+}
+header button.on {
+  background: var(--active);
+  color: #fff;
+}
+main {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  gap: 16px;
+}
+section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+}
+h2 {
+  margin: 0 0 12px;
+  font-size: 17px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+th,
+td {
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+th {
+  color: var(--muted);
+  font-weight: 600;
+}
+input,
+select,
+textarea {
+  font: inherit;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+textarea {
+  width: 100%;
+  min-height: 220px;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+}
+button.act {
+  background: var(--ink);
+  color: #fff;
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font: inherit;
+}
+button.act.secondary {
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid var(--border);
+}
+button.act.danger {
+  background: var(--missed);
+}
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.muted {
+  color: var(--muted);
+  font-size: 13px;
+}
+.err {
+  color: var(--missed);
+}
+.ok {
+  color: var(--landed);
+}
+pre {
+  background: var(--bg);
+  padding: 8px;
+  border-radius: 8px;
+  overflow: auto;
+  max-height: 360px;
+  font-size: 12px;
+}
