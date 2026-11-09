@@ -14,6 +14,7 @@ export class ApiError extends Error {
 }
 
 let token: string | null = null;
+export const getApiToken = () => token;
 export const setApiToken = (t: string | null) => {
   token = t;
 };

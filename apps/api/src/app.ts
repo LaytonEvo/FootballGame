@@ -11,7 +11,9 @@ import { getEconomy, getScoringConfig } from './services/config.js';
 import './services/live.js';
 import './services/leagues-hooks.js';
 import './services/coins-hooks.js';
+import './services/recap-hooks.js';
 import { rewardRoutes } from './routes/rewards.js';
+import { recapRoutes } from './routes/recap.js';
 import { leagueRoutes } from './routes/leagues.js';
 
 export async function buildApp(ctx: AppContext) {
@@ -40,5 +42,6 @@ export async function buildApp(ctx: AppContext) {
   pickRoutes(app, ctx);
   leagueRoutes(app, ctx);
   rewardRoutes(app, ctx);
+  recapRoutes(app, ctx);
   return app;
 }

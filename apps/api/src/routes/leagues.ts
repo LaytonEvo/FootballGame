@@ -58,7 +58,7 @@ export function leagueRoutes(app: FastifyInstance, ctx: AppContext) {
   /** Public preview for the invite landing (no sign-in needed). */
   app.get('/invites/:code', async (req) => {
     const { code } = z.object({ code: z.string().min(4).max(12) }).parse(req.params);
-    const l = await leagueByCode(ctx.db, code);
+    const l = await leagueByCode(ctx.db, code, ctx.clock.now());
     await track(ctx.db, ctx.clock.now(), null, 'invite_link_opened', { leagueId: l.id });
     return { name: l.name, members: (await memberIds(ctx.db, l.id)).length };
   });

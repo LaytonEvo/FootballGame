@@ -119,15 +119,38 @@ export async function createLeague(ctx: AppContext, ownerId: string, name: strin
   return l!;
 }
 
-export async function leagueByCode(db: DbOrTx, code: string) {
-  const [l] = await db.select().from(leagues).where(eq(leagues.code, code.trim().toUpperCase()));
-  if (!l) throw notFound('League');
-  return l;
+/**
+ * Resolve an invite code: a league code, or a player's personal invite code (from their share card), which
+ * opens that player's own mini-league (created on first use).
+ */
+export async function leagueByCode(db: DbOrTx, raw: string, now = new Date()) {
+  const code = raw.trim().toUpperCase();
+  const [l] = await db.select().from(leagues).where(eq(leagues.code, code));
+  if (l) return l;
+  const [inviter] = await db.select().from(users).where(eq(users.inviteCode, code));
+  if (!inviter) throw notFound('League');
+  const id = newId();
+  await db
+    .insert(leagues)
+    .values({
+      id,
+      name: `${inviter.displayName ?? 'Player'}'s league`,
+      code,
+      ownerId: inviter.id,
+      createdAt: now,
+    })
+    .onConflictDoNothing({ target: leagues.code });
+  const [created] = await db.select().from(leagues).where(eq(leagues.code, code));
+  await db
+    .insert(leagueMembers)
+    .values({ leagueId: created!.id, userId: inviter.id, joinedAt: now })
+    .onConflictDoNothing();
+  return created!;
 }
 
 export async function joinLeague(ctx: AppContext, userId: string, code: string) {
-  const l = await leagueByCode(ctx.db, code);
   const now = ctx.clock.now();
+  const l = await leagueByCode(ctx.db, code, now);
   const inserted = await ctx.db
     .insert(leagueMembers)
     .values({ leagueId: l.id, userId, joinedAt: now })

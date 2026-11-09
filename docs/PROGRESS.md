@@ -147,6 +147,20 @@ One short note per phase. Assumptions that need a product decision are collected
 - Test: ledger reconciles to balance through earn, buy (and retry), squad pack, swap, insufficient funds;
   milestones grant once; odds logged and shown.
 
+## Phase 8 — Recap and sharing ✅
+
+- `GET /recap/:gw`: points, actions landed, the five with points and "n of m landed", best action, league
+  moves, global top %, Coins earned, milestone packs unlocked. Home shows the latest finalised week's line.
+- `GET /recap/:gw/share.png?format=story|square` renders 1080×1920 and 1080×1080 PNGs server-side with
+  Satori + resvg (Sora / DM Sans): gradient, points, actions landed, rarity shirts with position or number
+  (no crests, kits or photos), best action, mini-league position, invite code + link, disclaimer.
+  Sample: `docs/screenshots/share-square.png`.
+- Every player's invite code on the card is redeemable: joining with it opens (and lazily creates) that
+  player's own mini-league, so shares turn into invites (`invite_accepted`).
+- Mobile recap screen with "Share my week" (9:16) and a square option: downloads the PNG and opens the
+  native share sheet (WhatsApp first on most devices); logs `recap_shared`.
+- Test: a finalised gameweek yields a recap and both images (dimensions checked) for every user.
+
 ## Assumptions to confirm
 
 | #   | Rule                                     | What the build does now                                                                                                       | Where               |
