@@ -20,13 +20,14 @@ export const setApiToken = (t: string | null) => {
 
 export async function api<T = unknown>(
   path: string,
-  init: { method?: string; body?: unknown } = {},
+  init: { method?: string; body?: unknown; headers?: Record<string, string> } = {},
 ): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
     method: init.method ?? (init.body ? 'POST' : 'GET'),
     headers: {
       ...(init.body ? { 'content-type': 'application/json' } : {}),
       ...(token ? { authorization: `Bearer ${token}` } : {}),
+      ...init.headers,
     },
     body: init.body ? JSON.stringify(init.body) : undefined,
   });

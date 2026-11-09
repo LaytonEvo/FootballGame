@@ -11,6 +11,7 @@ import { deliverNotifications, queueDeadlineReminders } from '../services/notifi
 import { finaliseDueGameweeks, lockDueGameweeks, pollLiveGameweeks } from './gameweek.js';
 import { afterFinalise } from './hooks.js';
 import '../services/leagues-hooks.js';
+import '../services/coins-hooks.js';
 
 /**
  * One idempotent pass of every scheduled job, driven by the server clock. The worker runs it every minute;

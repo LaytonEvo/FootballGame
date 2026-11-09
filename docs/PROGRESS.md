@@ -129,6 +129,24 @@ One short note per phase. Assumptions that need a product decision are collected
   last three weeks.
 - Test: create, invite by link, join, replay GW1 and GW2, tables match the stored scores, arrows correct.
 
+## Phase 7 — Coins, packs and rewards ✅
+
+- `coin_ledger` is append-only with a unique idempotency key per row; balance = `sum(amount)` (no balance
+  column). Finalisation credits 1 Coin per point once per gameweek (`gw:<gw>:<user>`); a negative week earns 0.
+- Shop: player pack 100, card swap 60, squad pack 400 (from the active economy config). Purchases need an
+  `Idempotency-Key`, run in a transaction with a row lock on the user, refuse when short, and a retry returns
+  the same pack. Swap: the card leaves the collection (`swapped`), a same-rarity swap pack is granted, the
+  squad auto-fills.
+- Weekly free pack: unlocked by confirming that week's actions (Phase 4). Season milestones from config are
+  granted as packs exactly once per season (grant keys) after each finalisation.
+- Pack odds come from `config/packs.v0.1.json`, are shown on every pack and in the shop, and are logged with
+  the seed on each opening.
+- Home Coins chip with a progress bar to the next pack; Coins & packs screen (Coins vs Season Points, next-pack
+  progress, milestone track, weekly free pack, shop with odds). Pack opening animation follows the token
+  motion spec with Skip and Reduce Motion (fade only); no near-miss effects.
+- Test: ledger reconciles to balance through earn, buy (and retry), squad pack, swap, insufficient funds;
+  milestones grant once; odds logged and shown.
+
 ## Assumptions to confirm
 
 | #   | Rule                                     | What the build does now                                                                                                       | Where               |

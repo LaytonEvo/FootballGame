@@ -10,6 +10,8 @@ import { pickRoutes } from './routes/picks.js';
 import { getEconomy, getScoringConfig } from './services/config.js';
 import './services/live.js';
 import './services/leagues-hooks.js';
+import './services/coins-hooks.js';
+import { rewardRoutes } from './routes/rewards.js';
 import { leagueRoutes } from './routes/leagues.js';
 
 export async function buildApp(ctx: AppContext) {
@@ -37,5 +39,6 @@ export async function buildApp(ctx: AppContext) {
   cardRoutes(app, ctx);
   pickRoutes(app, ctx);
   leagueRoutes(app, ctx);
+  rewardRoutes(app, ctx);
   return app;
 }
