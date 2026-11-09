@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Style options picker</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&amp;family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=DM+Sans:wght@400;500;700&amp;family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@400;500;700&amp;family=Outfit:wght@400;500;600;700;800&amp;family=Sora:wght@600;700&amp;family=Unbounded:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1000px; box-sizing: border-box; background: #FAFAF7; color: #111214; font-family: Inter, sans-serif; padding: 36px 40px; display: flex; gap: 40px">
+  <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 22px">
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <div style="font-size: 28px; font-weight: 700; letter-spacing: -0.02em">Pick a look</div>
+      <div style="font-size: 14px; color: #5E6470">Choose one colour palette, one font pairing and one icon style. In Play mode the phone on the right updates as you click.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: #5E6470">COLOUR</div>
+      <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px">
+        <sc-for list="{{palettes}}" as="o" hint-placeholder-count="4">
+          <button type="button" onClick="{{o.pick}}" aria-pressed="{{o.pressed}}" style="text-align: left; padding: 12px; border-radius: 14px; border: {{o.ring}}; background: #FFFFFF; cursor: pointer; display: flex; flex-direction: column; gap: 10px; font-family: Inter, sans-serif; color: #111214">
+            <div style="height: 64px; border-radius: 10px; background: {{o.bg}}; border: 1px solid {{o.border}}; padding: 10px; box-sizing: border-box; display: flex; align-items: flex-end; gap: 6px">
+              <span style="height: 26px; padding: 0 10px; border-radius: 8px; background: {{o.primary}}; color: {{o.onPrimary}}; font-size: 11px; font-weight: 700; display: flex; align-items: center">Pick</span>
+              <span style="height: 20px; padding: 0 8px; border-radius: 999px; background: {{o.accent}}; color: {{o.onAccent}}; font-size: 10px; font-weight: 700; display: flex; align-items: center">▲1</span>
+              <span style="margin-left: auto; width: 26px; height: 26px; border-radius: 6px; background: {{o.pitchA}}"></span>
+            </div>
+            <div style="display: flex; gap: 4px">
+              <span style="width: 18px; height: 18px; border-radius: 9px; background: {{o.bg}}; border: 1px solid #D9D9D2"></span>
+              <span style="width: 18px; height: 18px; border-radius: 9px; background: {{o.ink}}"></span>
+              <span style="width: 18px; height: 18px; border-radius: 9px; background: {{o.primary}}"></span>
+              <span style="width: 18px; height: 18px; border-radius: 9px; background: {{o.accent}}"></span>
+              <span style="width: 18px; height: 18px; border-radius: 9px; background: {{o.pitchA}}"></span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 2px">
+              <span style="font-size: 14px; font-weight: 700">{{o.name}}</span>
+              <span style="font-size: 12px; color: #5E6470">{{o.desc}}</span>
+            </div>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: #5E6470">TYPOGRAPHY</div>
+      <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px">
+        <sc-for list="{{types}}" as="t" hint-placeholder-count="4">
+          <button type="button" onClick="{{t.pick}}" aria-pressed="{{t.pressed}}" style="text-align: left; padding: 14px 12px; border-radius: 14px; border: {{t.ring}}; background: #FFFFFF; cursor: pointer; display: flex; flex-direction: column; gap: 8px; color: #111214">
+            <span style="font-family: {{t.head}}; font-weight: {{t.headWeight}}; font-size: {{t.specSize}}px; line-height: 1; letter-spacing: {{t.headTracking}}; text-transform: {{t.headCase}}">1d 4h 12m</span>
+            <span style="font-family: {{t.body}}; font-size: 14px; font-weight: 500">Pick your actions for GW12</span>
+            <span style="font-family: Inter, sans-serif; font-size: 14px; font-weight: 700; margin-top: 4px">{{t.name}}</span>
+            <span style="font-family: Inter, sans-serif; font-size: 12px; color: #5E6470">{{t.fonts}}</span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: #5E6470">ICONS · 10 STYLES</div>
+      <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px">
+        <sc-for list="{{icons}}" as="i" hint-placeholder-count="10">
+          <button type="button" onClick="{{i.pick}}" aria-pressed="{{i.pressed}}" style="text-align: left; padding: 12px 10px; border-radius: 14px; border: {{i.ring}}; background: {{i.cardBg}}; cursor: pointer; display: flex; flex-direction: column; gap: 10px; font-family: Inter, sans-serif; color: #111214">
+            <div style="display: flex; gap: 2px; justify-content: space-between">
+              <span style="width: 32px; height: 32px; border-radius: {{i.a.radius}}; background: {{i.a.tile}}; box-shadow: {{i.a.shadow}}; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="{{i.a.fill}}" fill-opacity="{{i.a.fillOpacity}}" stroke="{{i.a.stroke}}" stroke-width="{{i.a.sw}}" stroke-linecap="{{i.a.cap}}" stroke-linejoin="{{i.a.join}}" style="filter: {{i.a.filter}}" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"></path></svg></span><span style="width: 32px; height: 32px; border-radius: {{i.n.radius}}; background: {{i.n.tile}}; box-shadow: {{i.n.shadow}}; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="{{i.n.fill}}" fill-opacity="{{i.n.fillOpacity}}" stroke="{{i.n.stroke}}" stroke-width="{{i.n.sw}}" stroke-linecap="{{i.n.cap}}" stroke-linejoin="{{i.n.join}}" style="filter: {{i.n.filter}}" aria-hidden="true"><path d="M8 3 3 6l2 4 3-1v12h8V9l3 1 2-4-5-3c0 2-2 3-4 3S8 5 8 3z"></path></svg></span><span style="width: 32px; height: 32px; border-radius: {{i.n.radius}}; background: {{i.n.tile}}; box-shadow: {{i.n.shadow}}; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="{{i.n.fill}}" fill-opacity="{{i.n.fillOpacity}}" stroke="{{i.n.stroke}}" stroke-width="{{i.n.sw}}" stroke-linecap="{{i.n.cap}}" stroke-linejoin="{{i.n.join}}" style="filter: {{i.n.filter}}" aria-hidden="true"><rect x="7" y="3" width="13" height="16" rx="2"></rect><rect x="4" y="6" width="12" height="15" rx="2"></rect></svg></span><span style="width: 32px; height: 32px; border-radius: {{i.n.radius}}; background: {{i.n.tile}}; box-shadow: {{i.n.shadow}}; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="{{i.n.fill}}" fill-opacity="{{i.n.fillOpacity}}" stroke="{{i.n.stroke}}" stroke-width="{{i.n.sw}}" stroke-linecap="{{i.n.cap}}" stroke-linejoin="{{i.n.join}}" style="filter: {{i.n.filter}}" aria-hidden="true"><path d="M7 4h10v5a5 5 0 0 1-10 0z"></path><path d="M12 14v4M8 21h8M17 6h3v2a3 3 0 0 1-3 3M7 6H4v2a3 3 0 0 0 3 3" fill="none"></path></svg></span><span style="width: 32px; height: 32px; border-radius: {{i.n.radius}}; background: {{i.n.tile}}; box-shadow: {{i.n.shadow}}; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="{{i.n.fill}}" fill-opacity="{{i.n.fillOpacity}}" stroke="{{i.n.stroke}}" stroke-width="{{i.n.sw}}" stroke-linecap="{{i.n.cap}}" stroke-linejoin="{{i.n.join}}" style="filter: {{i.n.filter}}" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6z"></path></svg></span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 2px">
+              <span style="font-size: 13px; font-weight: 700">{{i.name}}</span>
+              <span style="font-size: 11px; color: #5E6470">{{i.desc}}</span>
+            </div>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="margin-top: auto; padding: 12px 14px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E4E4DC; font-size: 13px; color: #3B3F46">Current pick: <strong>{{p.name}}</strong> · <strong>{{t0.name}}</strong> · <strong>{{ic.name}}</strong></div>
+  </div>
+
+  <div style="width: 390px; height: 828px; flex-shrink: 0; border-radius: 36px; overflow: hidden; box-shadow: 0 0 0 8px #111214, 0 24px 60px rgba(17,18,20,0.18); background: {{p.bg}}; color: {{p.ink}}; font-family: {{t0.body}}; display: flex; flex-direction: column">
+    <div style="flex: 1; padding: 26px 18px 14px; display: flex; flex-direction: column; gap: 14px; overflow: hidden">
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: {{p.muted}}">GAMEWEEK 12</span>
+        <span style="height: 32px; padding: 0 12px; border-radius: 999px; background: {{p.surface}}; border: 1px solid {{p.border}}; font-size: 13px; font-weight: 700; display: flex; align-items: center">86 Coins</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <span style="font-size: 14px; color: {{p.muted}}">Actions lock in</span>
+        <span style="font-family: {{t0.head}}; font-weight: {{t0.headWeight}}; font-size: {{t0.heroSize}}px; line-height: 1; letter-spacing: {{t0.headTracking}}; text-transform: {{t0.headCase}}">1d 4h 12m</span>
+      </div>
+      <div style="height: 300px; position: relative; border-radius: 18px; overflow: hidden; background: {{p.pitchA}}">
+        <div style="position: absolute; left: 0; right: 0; top: 0; height: 34px; background: linear-gradient(90deg, {{p.bandA}}, {{p.bandB}}); display: flex; align-items: center; justify-content: space-between; padding: 0 14px; box-sizing: border-box; color: #FFFFFF; font-family: {{t0.head}}; font-weight: {{t0.headWeight}}; font-size: 15px; letter-spacing: {{t0.headTracking}}; text-transform: {{t0.headCase}}; text-shadow: 0 1px 2px rgba(0,0,0,0.25)"><span>Your five</span><span>GW12</span></div>
+        <div style="position: absolute; left: -30px; right: -30px; top: 34px; bottom: -20px; transform: perspective(520px) rotateX(22deg); transform-origin: 50% 0%; background: repeating-linear-gradient(180deg, {{p.pitchA}} 0px, {{p.pitchA}} 38px, {{p.pitchB}} 38px, {{p.pitchB}} 76px)">
+          <div style="position: absolute; left: 22px; right: 22px; top: 6px; bottom: 6px; border: 2px solid rgba(255,255,255,0.7)"></div>
+          <div style="position: absolute; left: 140px; width: 138px; top: 6px; height: 46px; border: 2px solid rgba(255,255,255,0.7); border-top: 0"></div>
+          <div style="position: absolute; left: 22px; right: 22px; top: 150px; height: 2px; background: rgba(255,255,255,0.7)"></div>
+          <div style="position: absolute; left: 169px; top: 112px; width: 80px; height: 80px; border: 2px solid rgba(255,255,255,0.7); border-radius: 50%"></div>
+        </div>
+        <div style="position: absolute; left: 146px; top: 40px; width: 66px; display: flex; flex-direction: column; align-items: center">
+          <dc-import name="Shirt" num="1" tier="silver" size="36" hint-size="36px,34px"></dc-import>
+          <div style="width: 66px; border-radius: 4px; overflow: hidden; box-shadow: 0 1px 3px rgba(16,21,58,0.25); text-align: center; font-family: {{t0.body}}">
+            <div style="background: #FFFFFF; color: #10153A; font-size: 11px; font-weight: 700; padding: 2px 0">Pickford</div>
+            <div style="background: #EEF1F6; color: #10153A; font-size: 10px; font-weight: 500; padding: 1px 0">BOU (A)</div>
+          </div>
+        </div>
+        <div style="position: absolute; left: 146px; top: 104px; width: 66px; display: flex; flex-direction: column; align-items: center">
+          <dc-import name="Shirt" num="4" tier="gold" size="36" hint-size="36px,34px"></dc-import>
+          <div style="width: 66px; border-radius: 4px; overflow: hidden; box-shadow: 0 1px 3px rgba(16,21,58,0.25); text-align: center; font-family: {{t0.body}}">
+            <div style="background: #FFFFFF; color: #10153A; font-size: 11px; font-weight: 700; padding: 2px 0">Van Dijk</div>
+            <div style="background: #EEF1F6; color: #10153A; font-size: 10px; font-weight: 500; padding: 1px 0">WHU (H)</div>
+          </div>
+        </div>
+        <div style="position: absolute; left: 60px; top: 166px; width: 66px; display: flex; flex-direction: column; align-items: center">
+          <dc-import name="Shirt" num="7" tier="gold" size="36" hint-size="36px,34px"></dc-import>
+          <div style="width: 66px; border-radius: 4px; overflow: hidden; box-shadow: 0 1px 3px rgba(16,21,58,0.25); text-align: center; font-family: {{t0.body}}">
+            <div style="background: #FFFFFF; color: #10153A; font-size: 11px; font-weight: 700; padding: 2px 0">Saka</div>
+            <div style="background: #EEF1F6; color: #10153A; font-size: 10px; font-weight: 500; padding: 1px 0">CHE (H)</div>
+          </div>
+        </div>
+        <div style="position: absolute; left: 232px; top: 166px; width: 66px; display: flex; flex-direction: column; align-items: center">
+          <dc-import name="Shirt" num="8" tier="silver" size="36" hint-size="36px,34px"></dc-import>
+          <div style="width: 66px; border-radius: 4px; overflow: hidden; box-shadow: 0 1px 3px rgba(16,21,58,0.25); text-align: center; font-family: {{t0.body}}">
+            <div style="background: #FFFFFF; color: #10153A; font-size: 11px; font-weight: 700; padding: 2px 0">Fernandes</div>
+            <div style="background: #EEF1F6; color: #10153A; font-size: 10px; font-weight: 500; padding: 1px 0">NEW (A)</div>
+          </div>
+        </div>
+        <div style="position: absolute; left: 146px; top: 228px; width: 66px; display: flex; flex-direction: column; align-items: center">
+          <dc-import name="Shirt" num="9" tier="elite" size="36" hint-size="36px,34px"></dc-import>
+          <div style="width: 66px; border-radius: 4px; overflow: hidden; box-shadow: 0 1px 3px rgba(16,21,58,0.25); text-align: center; font-family: {{t0.body}}">
+            <div style="background: #FFFFFF; color: #10153A; font-size: 11px; font-weight: 700; padding: 2px 0">Haaland</div>
+            <div style="background: #EEF1F6; color: #10153A; font-size: 10px; font-weight: 500; padding: 1px 0">BRE (H)</div>
+          </div>
+        </div>
+      </div>
+      <button type="button" style="height: 56px; border-radius: 16px; border: 0; background: {{p.primary}}; color: {{p.onPrimary}}; font-family: {{t0.head}}; font-weight: {{t0.headWeight}}; font-size: {{t0.buttonSize}}px; letter-spacing: {{t0.headTracking}}; text-transform: {{t0.headCase}}">Pick your actions</button>
+      <div style="background: {{p.surface}}; border: 1px solid {{p.border}}; border-radius: 16px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center">
+        <div style="display: flex; flex-direction: column; gap: 4px">
+          <span style="font-size: 13px; color: {{p.muted}}">Office League</span>
+          <span style="font-family: {{t0.head}}; font-weight: {{t0.headWeight}}; font-size: 24px; letter-spacing: {{t0.headTracking}}; text-transform: {{t0.headCase}}">2nd of 14</span>
+        </div>
+        <span style="height: 28px; padding: 0 12px; border-radius: 999px; background: {{p.accent}}; color: {{p.onAccent}}; font-size: 13px; font-weight: 700; display: flex; align-items: center">▲ 1 this week</span>
+      </div>
+    </div>
+    <nav aria-label="Main" style="height: 80px; background: {{p.surface}}; border-top: 1px solid {{p.border}}; display: flex; justify-content: space-around; align-items: center; padding-bottom: 8px">
+      <span style="display: flex; flex-direction: column; align-items: center; gap: 3px; color: {{p.active}}; font-size: 11px; font-weight: 700">
+        <span style="width: 40px; height: 32px; border-radius: {{ic.a.radius}}; background: {{ic.a.tile}}; box-shadow: {{ic.a.shadow}}; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="{{ic.a.fill}}" fill-opacity="{{ic.a.fillOpacity}}" stroke="{{ic.a.stroke}}" stroke-width="{{ic.a.sw}}" stroke-linecap="{{ic.a.cap}}" stroke-linejoin="{{ic.a.join}}" style="filter: {{ic.a.filter}}" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"></path></svg></span>Home</span>
+      <span style="display: flex; flex-direction: column; align-items: center; gap: 3px; color: {{p.muted}}; font-size: 11px; font-weight: 600">
+        <span style="width: 40px; height: 32px; border-radius: {{ic.n.radius}}; background: {{ic.n.tile}}; box-shadow: {{ic.n.shadow}}; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="{{ic.n.fill}}" fill-opacity="{{ic.n.fillOpacity}}" stroke="{{ic.n.stroke}}" stroke-width="{{ic.n.sw}}" stroke-linecap="{{ic.n.cap}}" stroke-linejoin="{{ic.n.join}}" style="filter: {{ic.n.filter}}" aria-hidden="true"><path d="M8 3 3 6l2 4 3-1v12h8V9l3 1 2-4-5-3c0 2-2 3-4 3S8 5 8 3z"></path></svg></span>Squad</span>
+      <span style="display: flex; flex-direction: column; align-items: center; gap: 3px; color: {{p.muted}}; font-size: 11px; font-weight: 600">
+        <span style="width: 40px; height: 32px; border-radius: {{ic.n.radius}}; background: {{ic.n.tile}}; box-shadow: {{ic.n.shadow}}; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="{{ic.n.fill}}" fill-opacity="{{ic.n.fillOpacity}}" stroke="{{ic.n.stroke}}" stroke-width="{{ic.n.sw}}" stroke-linecap="{{ic.n.cap}}" stroke-linejoin="{{ic.n.join}}" style="filter: {{ic.n.filter}}" aria-hidden="true"><rect x="7" y="3" width="13" height="16" rx="2"></rect><rect x="4" y="6" width="12" height="15" rx="2"></rect></svg></span>Collection</span>
+      <span style="display: flex; flex-direction: column; align-items: center; gap: 3px; color: {{p.muted}}; font-size: 11px; font-weight: 600">
+        <span style="width: 40px; height: 32px; border-radius: {{ic.n.radius}}; background: {{ic.n.tile}}; box-shadow: {{ic.n.shadow}}; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="{{ic.n.fill}}" fill-opacity="{{ic.n.fillOpacity}}" stroke="{{ic.n.stroke}}" stroke-width="{{ic.n.sw}}" stroke-linecap="{{ic.n.cap}}" stroke-linejoin="{{ic.n.join}}" style="filter: {{ic.n.filter}}" aria-hidden="true"><path d="M7 4h10v5a5 5 0 0 1-10 0z"></path><path d="M12 14v4M8 21h8M17 6h3v2a3 3 0 0 1-3 3M7 6H4v2a3 3 0 0 0 3 3" fill="none"></path></svg></span>Leagues</span>
+      <span style="display: flex; flex-direction: column; align-items: center; gap: 3px; color: {{p.muted}}; font-size: 11px; font-weight: 600">
+        <span style="width: 40px; height: 32px; border-radius: {{ic.n.radius}}; background: {{ic.n.tile}}; box-shadow: {{ic.n.shadow}}; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="{{ic.n.fill}}" fill-opacity="{{ic.n.fillOpacity}}" stroke="{{ic.n.stroke}}" stroke-width="{{ic.n.sw}}" stroke-linecap="{{ic.n.cap}}" stroke-linejoin="{{ic.n.join}}" style="filter: {{ic.n.filter}}" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6z"></path></svg></span>Profile</span>
+    </nav>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { palette: 0, type: 4, icon: 5 };
+  }
+  renderVals() {
+    const palettes = [
+      { name: 'Clean Fantasy', desc: 'White, vivid pitch, navy, aqua', bg: '#F4F6FA', surface: '#FFFFFF', border: '#E3E7EF', ink: '#10153A', muted: '#5A6178', primary: '#10153A', onPrimary: '#FFFFFF', accent: '#00D9C0', onAccent: '#06201D', active: '#3D5AFE', pitchA: '#13B556', pitchB: '#10AB50', tile: '#E6EAFF', bandA: '#00D9C0', bandB: '#3D5AFE' },
+      { name: 'Floodlight', desc: 'Bright white, electric lime, violet', bg: '#F6F6F1', surface: '#FFFFFF', border: '#E4E4DC', ink: '#0D0F12', muted: '#5E6470', primary: '#C6FF3D', onPrimary: '#0D0F12', accent: '#6C4CFF', onAccent: '#FFFFFF', active: '#6C4CFF', pitchA: '#22A45D', pitchB: '#1F9955', tile: '#EEF9D6', bandA: '#C6FF3D', bandB: '#6C4CFF' },
+      { name: 'Neon Night', desc: 'Dark mode, hot pink, cyan', bg: '#0B0B12', surface: '#17171F', border: '#2A2A36', ink: '#F5F5FA', muted: '#A3A3B5', primary: '#FF3D7F', onPrimary: '#0B0B12', accent: '#3DE0FF', onAccent: '#0B0B12', active: '#FF3D7F', pitchA: '#14472F', pitchB: '#11402A', tile: '#2A1220', bandA: '#FF3D7F', bandB: '#3DE0FF' },
+      { name: 'Pitch Pop', desc: 'Fresh mint, emerald, coral', bg: '#F1F7F2', surface: '#FFFFFF', border: '#DCE9DF', ink: '#0F1A14', muted: '#55665B', primary: '#00874E', onPrimary: '#FFFFFF', accent: '#FF6B4A', onAccent: '#1A0B07', active: '#00874E', pitchA: '#00B86B', pitchB: '#00AD64', tile: '#DDF5E8', bandA: '#00874E', bandB: '#FF6B4A' },
+      { name: 'Retro Kit', desc: 'Warm cream, cobalt, orange', bg: '#FFF6E8', surface: '#FFFFFF', border: '#F0E2CB', ink: '#14110D', muted: '#6B6256', primary: '#1F4BFF', onPrimary: '#FFFFFF', accent: '#FF7A1A', onAccent: '#1A0E04', active: '#1F4BFF', pitchA: '#3FA34D', pitchB: '#399948', tile: '#E3E9FF', bandA: '#1F4BFF', bandB: '#FF7A1A' }
+    ];
+    const types = [
+      { name: 'Clean Geometric', fonts: 'Outfit throughout', head: 'Outfit, sans-serif', headWeight: 700, headTracking: '-0.02em', headCase: 'none', body: 'Outfit, sans-serif', specSize: 24, heroSize: 48, buttonSize: 18 },
+      { name: 'Sporty Condensed', fonts: 'Barlow Condensed + Inter', head: "'Barlow Condensed', sans-serif", headWeight: 800, headTracking: '0.01em', headCase: 'uppercase', body: 'Inter, sans-serif', specSize: 30, heroSize: 58, buttonSize: 22 },
+      { name: 'Geometric Bold', fonts: 'Unbounded + Manrope', head: 'Unbounded, sans-serif', headWeight: 700, headTracking: '-0.02em', headCase: 'none', body: 'Manrope, sans-serif', specSize: 17, heroSize: 38, buttonSize: 16 },
+      { name: 'Editorial Grotesk', fonts: 'Bricolage Grotesque + Inter', head: "'Bricolage Grotesque', sans-serif", headWeight: 800, headTracking: '-0.03em', headCase: 'none', body: 'Inter, sans-serif', specSize: 23, heroSize: 50, buttonSize: 18 },
+      { name: 'Friendly Rounded', fonts: 'Sora + DM Sans', head: 'Sora, sans-serif', headWeight: 700, headTracking: '-0.02em', headCase: 'none', body: "'DM Sans', sans-serif", specSize: 21, heroSize: 44, buttonSize: 17 }
+    ];
+    const s = this.state;
+    const ring = (on) => (on ? '2px solid #111214' : '1px solid #E4E4DC');
+    const p = palettes.at(s.palette);
+    const t0 = types.at(s.type);
+    const base = { fill: 'none', fillOpacity: 1, stroke: p.muted, sw: 1.8, cap: 'round', join: 'round', tile: 'transparent', radius: '10px', shadow: 'none', filter: 'none' };
+    const v = (o) => ({ ...base, ...o });
+    const grad = 'linear-gradient(135deg, ' + p.bandA + ', ' + p.bandB + ')';
+    const icons = [
+      { name: 'Clean outline', desc: 'Thin rounded strokes', a: v({ stroke: p.active, sw: 1.7 }), n: v({ sw: 1.7 }) },
+      { name: 'Bold filled', desc: 'Solid glyphs', a: v({ fill: p.active, stroke: p.active, sw: 1.2 }), n: v({ fill: p.muted, sw: 1.2 }) },
+      { name: 'Duotone', desc: 'Tint fill plus outline', a: v({ fill: p.active, fillOpacity: 0.22, stroke: p.active }), n: v({ fill: p.muted, fillOpacity: 0.15 }) },
+      { name: 'Chunky sticker', desc: 'Thick strokes, tinted tile', a: v({ stroke: p.ink, sw: 2.6, tile: p.tile }), n: v({ sw: 2.6 }) },
+      { name: 'Accent two-tone', desc: 'Ink outline, aqua fill', a: v({ fill: p.accent, stroke: p.ink, sw: 1.8 }), n: v({ fill: p.border, stroke: p.muted }) },
+      { name: 'Gradient tile', desc: 'White glyph on the accent band', a: v({ stroke: '#FFFFFF', sw: 2, tile: grad }), n: v({}) },
+      { name: 'Solid circle', desc: 'White glyph in an ink circle', a: v({ fill: '#FFFFFF', stroke: '#FFFFFF', sw: 1, tile: p.ink, radius: '50%' }), n: v({ fill: p.muted, sw: 1 }) },
+      { name: 'Soft bubble', desc: 'Puffy tint with a drop edge', a: v({ fill: p.tile, stroke: p.active, sw: 2.2, filter: 'drop-shadow(0 2px 0 ' + p.active + '55)' }), n: v({ sw: 2 }) },
+      { name: 'Line + underline', desc: 'Outline with an aqua bar', a: v({ stroke: p.ink, sw: 1.8, shadow: 'inset 0 -3px 0 ' + p.accent, radius: '2px' }), n: v({}) },
+      { name: 'Sharp geometric', desc: 'Square ends, crisp corners', a: v({ stroke: p.ink, sw: 2, cap: 'square', join: 'miter' }), n: v({ sw: 2, cap: 'square', join: 'miter' }) }
+    ];
+    const icBase = icons.at(s.icon);
+    return {
+      palettes: palettes.map((o, i) => ({ ...o, ring: ring(i === s.palette), pressed: i === s.palette ? 'true' : 'false', pick: () => this.setState({ palette: i }) })),
+      types: types.map((o, i) => ({ ...o, ring: ring(i === s.type), pressed: i === s.type ? 'true' : 'false', pick: () => this.setState({ type: i }) })),
+      icons: icons.map((o, i) => ({ ...o, cardBg: p.surface === '#FFFFFF' ? '#FFFFFF' : p.bg, ring: ring(i === s.icon), pressed: i === s.icon ? 'true' : 'false', pick: () => this.setState({ icon: i }) })),
+      p,
+      t0,
+      ic: icBase
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Player shirts four rarities</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Sora:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 880px; height: 300px; box-sizing: border-box; background: #F4F6FA; color: #10153A; font-family: 'DM Sans', sans-serif; padding: 32px 48px; display: flex; flex-direction: column; gap: 20px">
+  <div style="display: flex; flex-direction: column; gap: 4px">
+    <div style="font-family: Sora, sans-serif; font-size: 22px; font-weight: 700">One shirt, four rarities</div>
+    <div style="font-size: 14px; color: #5A6178">White body, rarity-coloured sleeves, collar and side panels. No club colours or kit designs in the test build.</div>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px">
+    <sc-for list="{{tiers}}" as="t" hint-placeholder-count="4">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 16px 0; border-radius: 16px; background: #13B556">
+        <dc-import name="Shirt" num="{{t.num}}" tier="{{t.tier}}" size="112" hint-size="112px,105px"></dc-import>
+        <div style="padding: 3px 10px; border-radius: 6px; background: #FFFFFF; font-size: 13px; font-weight: 700">{{t.label}}</div>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":880,"height":300}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      tiers: [
+        { tier: 'bronze', num: 18, label: 'Bronze' },
+        { tier: 'silver', num: 8, label: 'Silver' },
+        { tier: 'gold', num: 7, label: 'Gold' },
+        { tier: 'elite', num: 9, label: 'Elite' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

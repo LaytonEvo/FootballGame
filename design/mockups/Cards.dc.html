@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Card rarities test build</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Sora:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 880px; height: 560px; box-sizing: border-box; background: #F4F6FA; color: #10153A; font-family: 'DM Sans', sans-serif; padding: 40px 48px; display: flex; flex-direction: column; gap: 28px">
+  <div style="display: flex; flex-direction: column; gap: 6px">
+    <div style="font-family: Sora, sans-serif; font-size: 26px; font-weight: 700">Four rarities, typography only</div>
+    <div style="font-size: 14px; color: #5A6178">Test build: no photos, crests, kits or league marks. Shirt number is the hero; frame colour is the rarity; club is a three-letter code.</div>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px">
+    <sc-for list="{{cards}}" as="c" hint-placeholder-count="4">
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="height: 300px; box-sizing: border-box; border-radius: 18px; border: 2.5px solid {{c.color}}; background: #FFFFFF; padding: 14px; display: flex; flex-direction: column">
+          <div style="display: flex; justify-content: space-between; align-items: center">
+            <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: {{c.color}}">{{c.tier}}</span>
+            <span style="font-family: Sora, sans-serif; font-size: 17px; font-weight: 700; padding: 1px 8px; border-radius: 6px; background: #F4F6FA">{{c.rating}}</span>
+          </div>
+          <div style="flex: 1; display: flex; align-items: center; justify-content: center; font-family: Sora, sans-serif; font-size: 104px; font-weight: 700; line-height: 1; color: {{c.color}}; letter-spacing: -0.04em">{{c.num}}</div>
+          <div style="font-size: 18px; font-weight: 700">{{c.name}}</div>
+          <div style="font-size: 12px; color: #5A6178; margin-top: 2px">{{c.meta}}</div>
+          <div style="display: flex; justify-content: space-between; margin-top: 10px; padding-top: 8px; border-top: 1px solid #E3E7EF; font-size: 11px; color: #5A6178">
+            <span>Form {{c.form}}</span>
+            <span>{{c.slots}}</span>
+          </div>
+        </div>
+        <div style="font-size: 13px; color: #5A6178">{{c.caption}}</div>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":880,"height":560}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      cards: [
+        { tier: 'BRONZE', color: '#A9683A', rating: 68, num: 18, name: 'D. Welbeck', meta: 'FWD · BHA', form: '2 · 6 · 0', slots: '2 action slots', caption: 'Bronze · pays x1.2' },
+        { tier: 'SILVER', color: '#7C8796', rating: 76, num: 20, name: 'J. Bowen', meta: 'FWD · WHU', form: '5 · 3 · 8', slots: '2 action slots', caption: 'Silver · pays x1.1' },
+        { tier: 'GOLD', color: '#B8860B', rating: 85, num: 7, name: 'B. Saka', meta: 'MID · ARS', form: '9 · 4 · 15', slots: '2 action slots', caption: 'Gold · pays x1.0' },
+        { tier: 'ELITE', color: '#6A55E0', rating: 92, num: 9, name: 'E. Haaland', meta: 'FWD · MCI', form: '12 · 5 · 10', slots: '2 action slots', caption: 'Elite · pays x0.9' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

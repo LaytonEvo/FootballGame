@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tab bar</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<nav aria-label="Main" style="width: 390px; height: 76px; box-sizing: border-box; background: #FFFFFF; border-top: 1px solid #E3E7EF; display: flex; justify-content: space-around; align-items: center; padding: 0 6px 8px; font-family: 'DM Sans', sans-serif">
+  <sc-for list="{{tabs}}" as="t" hint-placeholder-count="5">
+    <button type="button" aria-current="{{t.current}}" style="background: none; border: 0; min-width: 64px; min-height: 58px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: {{t.color}}; font: {{t.weight}} 11px 'DM Sans', sans-serif; cursor: pointer; padding: 0">
+      <span style="width: 40px; height: 32px; border-radius: 10px; background: {{t.tile}}; box-shadow: {{t.shadow}}; display: flex; align-items: center; justify-content: center">
+        <sc-if value="{{t.isHome}}" hint-placeholder-val="{{false}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{t.stroke}}" stroke-width="{{t.sw}}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"></path></svg></sc-if>
+        <sc-if value="{{t.isSquad}}" hint-placeholder-val="{{false}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{t.stroke}}" stroke-width="{{t.sw}}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3 3 6l2 4 3-1v12h8V9l3 1 2-4-5-3c0 2-2 3-4 3S8 5 8 3z"></path></svg></sc-if>
+        <sc-if value="{{t.isCollection}}" hint-placeholder-val="{{false}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{t.stroke}}" stroke-width="{{t.sw}}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="3" width="13" height="16" rx="2"></rect><rect x="4" y="6" width="12" height="15" rx="2"></rect></svg></sc-if>
+        <sc-if value="{{t.isLeagues}}" hint-placeholder-val="{{false}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{t.stroke}}" stroke-width="{{t.sw}}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h10v5a5 5 0 0 1-10 0z"></path><path d="M12 14v4M8 21h8M17 6h3v2a3 3 0 0 1-3 3M7 6H4v2a3 3 0 0 0 3 3"></path></svg></sc-if>
+        <sc-if value="{{t.isProfile}}" hint-placeholder-val="{{false}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{t.stroke}}" stroke-width="{{t.sw}}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg></sc-if>
+      </span>
+      <span>{{t.label}}</span>
+    </button>
+  </sc-for>
+</nav>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"active":{"editor":"enum","options":["home","squad","collection","leagues","profile"],"default":"home"},"$preview":{"width":390,"height":76}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const a = this.props.active ?? 'home';
+    const ids = [['home', 'Home'], ['squad', 'Squad'], ['collection', 'Collection'], ['leagues', 'Leagues'], ['profile', 'Profile']];
+    return {
+      tabs: ids.map(([id, label]) => {
+        const on = id === a;
+        return {
+          label,
+          isHome: id === 'home', isSquad: id === 'squad', isCollection: id === 'collection', isLeagues: id === 'leagues', isProfile: id === 'profile',
+          current: on ? 'page' : 'false',
+          color: on ? '#3D5AFE' : '#5A6178',
+          weight: on ? 700 : 600,
+          tile: on ? 'linear-gradient(135deg, #00D9C0, #3D5AFE)' : 'transparent',
+          shadow: on ? '0 3px 8px rgba(61,90,254,0.30)' : 'none',
+          stroke: on ? '#FFFFFF' : '#5A6178',
+          sw: on ? 2 : 1.8
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

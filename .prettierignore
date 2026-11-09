@@ -1,0 +1,7 @@
+design/mockups
+data
+pnpm-lock.yaml
+**/dist
+**/.expo
+tools/sim/baseline
+AGENTS.md

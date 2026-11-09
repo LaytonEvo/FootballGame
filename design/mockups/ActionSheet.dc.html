@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scoring actions sheet</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Sora:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3D5AFE}a:hover{color:#2A44D9}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #1E2350; color: #10153A; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column">
+  <div style="height: 64px; padding: 22px 20px 0; box-sizing: border-box; font-family: Sora, sans-serif; font-size: 20px; font-weight: 700; color: rgba(255,255,255,0.55)">GW12 actions</div>
+  <div style="flex: 1; background: #FFFFFF; border-radius: 24px 24px 0 0; padding: 10px 20px 0; display: flex; flex-direction: column; gap: 12px; overflow: hidden">
+    <div style="width: 40px; height: 4px; border-radius: 2px; background: #D5DAE5; align-self: center"></div>
+    <div style="display: flex; gap: 12px; align-items: center">
+      <dc-import name="Shirt" num="7" tier="gold" size="54" hint-size="54px,51px"></dc-import>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+        <div style="font-size: 17px; font-weight: 700">Saka · scoring actions</div>
+        <div style="font-size: 13px; color: #5A6178">MID · ARS · v CHE (H) · Sat 17:30</div>
+      </div>
+      <div style="font-size: 13px; color: #5A6178">1 of 2</div>
+    </div>
+    <div style="flex: 1; overflow: hidden; display: flex; flex-direction: column; gap: 10px">
+      <sc-for list="{{groups}}" as="g" hint-placeholder-count="4">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <div style="display: flex; align-items: center; gap: 8px; padding: 2px 2px 0">
+            <div style="display: flex; align-items: flex-end; gap: 2px; height: 12px" aria-hidden="true">
+              <div style="width: 3px; height: 4px; border-radius: 1px; background: {{g.b1}}"></div>
+              <div style="width: 3px; height: 7px; border-radius: 1px; background: {{g.b2}}"></div>
+              <div style="width: 3px; height: 10px; border-radius: 1px; background: {{g.b3}}"></div>
+              <div style="width: 3px; height: 12px; border-radius: 1px; background: {{g.b4}}"></div>
+            </div>
+            <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #10153A">{{g.tier}}</div>
+            <div style="font-size: 12px; color: #5A6178">{{g.note}}</div>
+          </div>
+          <sc-for list="{{g.items}}" as="it" hint-placeholder-count="2">
+            <button type="button" style="min-height: 44px; padding: 6px 12px; border-radius: 10px; background: {{it.bg}}; border: 1.5px solid {{it.border}}; color: #10153A; display: flex; align-items: center; gap: 10px; text-align: left; font-family: 'DM Sans', sans-serif">
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 1px">
+                <span style="font-size: 14px; font-weight: 600">{{it.label}}</span>
+                <span style="font-size: 12px; color: #5A6178">{{it.hint}}</span>
+              </div>
+              <span style="font-size: 14px; font-weight: 700; color: #3D5AFE">{{it.pts}}</span>
+              <sc-if value="{{it.selected}}" hint-placeholder-val="{{false}}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3D5AFE" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Selected"><path d="M5 12l5 5 9-10"></path></svg>
+              </sc-if>
+            </button>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+    <div style="padding: 10px 0 22px; border-top: 1px solid #E3E7EF; display: flex; flex-direction: column; gap: 10px">
+      <button type="button" role="switch" aria-checked="true" style="min-height: 44px; background: none; border: 0; padding: 0; display: flex; align-items: center; gap: 12px; color: #10153A; font: 500 14px 'DM Sans', sans-serif; text-align: left">
+        <span style="flex: 1">Make Assist my bold action <span style="color: #5A6178">(double if it lands, −8 if not)</span></span>
+        <span style="width: 44px; height: 26px; border-radius: 13px; background: #E07B00; display: flex; align-items: center; justify-content: flex-end; padding: 3px; box-sizing: border-box"><span style="width: 20px; height: 20px; border-radius: 10px; background: #FFFFFF"></span></span>
+      </button>
+      <a href="Predictions.dc.html" style="display: flex; align-items: center; justify-content: center; height: 50px; border-radius: 14px; background: #10153A; color: #FFFFFF; font-size: 16px; font-weight: 700; text-decoration: none">Done</a>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const on = '#3D5AFE', off = '#D5DAE5';
+    const bars = (n) => ({ b1: n >= 1 ? on : off, b2: n >= 2 ? on : off, b3: n >= 3 ? on : off, b4: n >= 4 ? on : off });
+    const item = (label, pts, hint, selected) => ({ label, pts: '+' + pts + ' pts', hint, selected: !!selected, bg: selected ? '#E0FBF7' : '#F4F6FA', border: selected ? '#3D5AFE' : 'transparent' });
+    return {
+      groups: [
+        { tier: 'Likely', note: 'happens most weeks', ...bars(1), items: [item('Plays full 90', 3, 'Did in 4 of last 5')] },
+        { tier: 'Possible', note: '', ...bars(2), items: [item('Goal involvement', 8, '3 of last 5'), item('3+ tackles', 8, '1 of last 5'), item('Clean sheet', 7, 'ARS: 2 of last 5')] },
+        { tier: 'Bold', note: '', ...bars(3), items: [item('Assist', 15, '2 of last 5', true), item('Goal', 10, '1 of last 5')] },
+        { tier: 'Chaos', note: 'max 1 per squad', ...bars(4), items: [item('Yellow card', 4, '1 of last 5'), item('Scores and gets booked', 40, '0 of last 5')] }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

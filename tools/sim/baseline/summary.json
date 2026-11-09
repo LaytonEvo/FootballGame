@@ -1,0 +1,216 @@
+{
+ "results": {
+  "v0.1": {
+   "smart": {
+    "mean": 663.6733333333333,
+    "p10": 575.5,
+    "p50": 664.0,
+    "p90": 758.1,
+    "top1": 821.06
+   },
+   "always_goal": {
+    "mean": 535.5866666666667,
+    "p10": 435.0,
+    "p50": 531.0,
+    "p90": 645.1,
+    "top1": 720.55
+   },
+   "chaos_chaser": {
+    "mean": 129.64,
+    "p10": 72.0,
+    "p50": 115.0,
+    "p90": 199.1,
+    "top1": 308.0
+   },
+   "random": {
+    "mean": 328.49333333333334,
+    "p10": 265.8,
+    "p50": 318.5,
+    "p90": 406.29999999999995,
+    "top1": 464.02
+   },
+   "smart_Bronze": {
+    "mean": 515.4133333333333,
+    "p10": 452.7,
+    "p50": 514.0,
+    "p90": 583.3,
+    "top1": 642.06
+   },
+   "smart_Elite": {
+    "mean": 832.5266666666666,
+    "p10": 737.9,
+    "p50": 835.0,
+    "p90": 926.2,
+    "top1": 1005.7099999999998
+   }
+  },
+  "v0.2": {
+   "smart": {
+    "mean": 732.2333333333333,
+    "p10": 614.3,
+    "p50": 735.5,
+    "p90": 846.0999999999999,
+    "top1": 986.2199999999998
+   },
+   "always_goal": {
+    "mean": 626.78,
+    "p10": 522.7,
+    "p50": 619.5,
+    "p90": 757.5,
+    "top1": 854.0899999999995
+   },
+   "chaos_chaser": {
+    "mean": 347.43333333333334,
+    "p10": 220.0,
+    "p50": 340.0,
+    "p90": 500.0,
+    "top1": 633.0499999999995
+   },
+   "random": {
+    "mean": 542.3,
+    "p10": 419.9,
+    "p50": 533.5,
+    "p90": 674.2,
+    "top1": 822.6599999999994
+   },
+   "smart_Bronze": {
+    "mean": 598.3266666666667,
+    "p10": 519.9,
+    "p50": 594.5,
+    "p90": 682.2,
+    "top1": 746.02
+   },
+   "smart_Elite": {
+    "mean": 879.3533333333334,
+    "p10": 770.9,
+    "p50": 865.5,
+    "p90": 1004.9,
+    "top1": 1172.979999999999
+   }
+  }
+ },
+ "fpl_tier_avg": {
+  "Bronze": 2.81640625,
+  "Elite": 3.8639322916666665,
+  "Gold": 3.198174706649283,
+  "Silver": 2.9400260756192957
+ },
+ "pool_rows": 6140,
+ "all_rows": 29338,
+ "v02": {
+  "Scores a goal (per goal)": [
+   null,
+   25,
+   10,
+   5
+  ],
+  "Scores 2+ goals": [
+   null,
+   null,
+   60,
+   20
+  ],
+  "Hat-trick": [
+   null,
+   null,
+   null,
+   60
+  ],
+  "Assist": [
+   60,
+   15,
+   15,
+   20
+  ],
+  "Goal involvement": [
+   null,
+   15,
+   8,
+   5
+  ],
+  "Clean sheet (60+ mins)": [
+   7,
+   8,
+   7,
+   null
+  ],
+  "3+ saves": [
+   3,
+   null,
+   null,
+   null
+  ],
+  "5+ saves": [
+   10,
+   null,
+   null,
+   null
+  ],
+  "Penalty save": [
+   60,
+   null,
+   null,
+   null
+  ],
+  "3+ tackles": [
+   null,
+   8,
+   8,
+   25
+  ],
+  "5+ clearances/blocks/interceptions": [
+   null,
+   3,
+   15,
+   null
+  ],
+  "Defensive contribution target": [
+   null,
+   7,
+   9,
+   null
+  ],
+  "Plays full 90": [
+   2,
+   2,
+   3,
+   4
+  ],
+  "Off the bench and scores": [
+   null,
+   null,
+   null,
+   55
+  ],
+  "Yellow card": [
+   9,
+   4,
+   4,
+   6
+  ],
+  "Red card": [
+   null,
+   60,
+   null,
+   null
+  ],
+  "Own goal": [
+   60,
+   60,
+   null,
+   null
+  ],
+  "Misses a penalty": [
+   null,
+   null,
+   null,
+   60
+  ],
+  "Scores and gets booked": [
+   null,
+   60,
+   40,
+   10
+  ]
+ }
+}

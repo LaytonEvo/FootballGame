@@ -1,0 +1,33 @@
+{
+  "name": "@ff/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "start": "tsx src/main.ts",
+    "worker": "tsx src/worker.ts",
+    "seed": "tsx src/seed.ts",
+    "db:generate": "drizzle-kit generate",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.5.15",
+    "@fastify/cors": "^11.4.1",
+    "@ff/fpl-dataset": "workspace:*",
+    "@ff/scoring": "workspace:*",
+    "@ff/shared": "workspace:*",
+    "bullmq": "^6.7.2",
+    "drizzle-orm": "^0.45.4",
+    "fastify": "^5.12.8",
+    "ioredis": "^5.4.0",
+    "pg": "^8.23.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.11.0",
+    "drizzle-kit": "^0.31.11",
+    "tsx": "^4.23.15"
+  }
+}

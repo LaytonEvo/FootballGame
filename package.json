@@ -1,0 +1,40 @@
+{
+  "name": "fantasy-five",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "turbo run dev --filter=@ff/api --filter=@ff/mobile",
+    "dev:all": "turbo run dev",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "seed": "pnpm --filter @ff/api seed",
+    "replay": "pnpm --filter @ff/scoring replay",
+    "economy-check": "pnpm --filter @ff/scoring economy-check",
+    "data:fetch": "node tools/data/fetch-fpl-dataset.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.0",
+    "@types/node": "^22.10.0",
+    "eslint": "^10.14.0",
+    "globals": "^16.0.0",
+    "prettier": "^3.9.10",
+    "turbo": "^2.11.10",
+    "typescript": "5.9.3",
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^5.1.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "msgpackr-extract",
+      "@electric-sql/pglite"
+    ]
+  }
+}

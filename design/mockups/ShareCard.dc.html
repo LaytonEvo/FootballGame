@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Share card</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Sora:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 540px; height: 960px; box-sizing: border-box; background: linear-gradient(160deg, #00D9C0 0%, #3D5AFE 100%); color: #FFFFFF; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column; padding: 56px 48px 48px">
+  <div style="display: flex; justify-content: space-between; align-items: center">
+    <div style="font-family: Sora, sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 0.02em">[GAME NAME]</div>
+    <div style="font-size: 18px; font-weight: 700; padding: 8px 14px; border-radius: 999px; background: #FFFFFF; color: #3D5AFE">GW12</div>
+  </div>
+  <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 8px">
+    <div style="font-size: 24px; font-weight: 600">Layton scored</div>
+    <div style="display: flex; align-items: flex-end; gap: 14px">
+      <div style="font-family: Sora, sans-serif; font-size: 230px; font-weight: 700; line-height: 0.8; letter-spacing: -0.05em">66</div>
+      <div style="font-family: Sora, sans-serif; font-size: 44px; font-weight: 700; padding-bottom: 8px">PTS</div>
+    </div>
+    <div style="font-size: 30px; font-weight: 700; margin-top: 24px">6 of 8 actions landed</div>
+    <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 28px">
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; border-radius: 16px; background: #10153A; color: #FFFFFF">
+        <span style="font-size: 20px; font-weight: 600">Best action: Saka assist</span>
+        <span style="font-family: Sora, sans-serif; font-size: 28px; font-weight: 700; color: #00D9C0">+30</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; border-radius: 16px; border: 3px solid #FFFFFF">
+        <span style="font-size: 20px; font-weight: 600">Office League</span>
+        <span style="font-size: 24px; font-weight: 700">2nd ▲1</span>
+      </div>
+    </div>
+  </div>
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; padding-top: 24px; border-top: 3px solid rgba(255,255,255,0.7)">
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <span style="font-size: 18px; font-weight: 600">Think you can beat that?</span>
+      <span style="font-size: 16px">Join with code</span>
+    </div>
+    <div style="font-family: Sora, sans-serif; font-size: 32px; font-weight: 700; letter-spacing: 0.04em">OFFICE-4KQ</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":540,"height":960}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

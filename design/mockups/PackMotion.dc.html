@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pack opening motion</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Sora:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3D5AFE}a:hover{color:#2A44D9}
+.shake{animation:packshake 0.6s ease-in-out}
+@keyframes packshake{0%,100%{transform:rotate(0deg)}15%{transform:rotate(-5deg)}30%{transform:rotate(5deg)}45%{transform:rotate(-4deg)}60%{transform:rotate(4deg)}75%{transform:rotate(-2deg)}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F6FA; color: #10153A; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column; padding: 24px 20px 28px; gap: 12px">
+  <div style="display: flex; justify-content: space-between; align-items: center; height: 44px">
+    <div style="font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #5A6178">Player pack</div>
+    <sc-if value="{{notRevealed}}" hint-placeholder-val="{{true}}">
+      <button type="button" onClick="{{skip}}" style="height: 44px; padding: 0 14px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E7EF; color: #10153A; font: 600 14px 'DM Sans', sans-serif; cursor: pointer">Skip</button>
+    </sc-if>
+    <sc-if value="{{revealed}}" hint-placeholder-val="{{false}}">
+      <button type="button" onClick="{{replay}}" style="height: 44px; padding: 0 14px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E7EF; color: #10153A; font: 600 14px 'DM Sans', sans-serif; cursor: pointer">Replay</button>
+    </sc-if>
+  </div>
+  <div style="flex: 1; position: relative">
+    <div style="position: absolute; left: 25px; top: 140px; width: 300px; height: 300px; border-radius: 50%; border: 2px solid #B8860B; box-shadow: 0 0 0 18px rgba(184,134,11,0.10), 0 0 0 40px rgba(184,134,11,0.05); transform: scale({{glowScale}}); opacity: {{glowOpacity}}; transition: transform 0.5s ease-out, opacity 0.5s ease-out"></div>
+    <div style="position: absolute; left: 45px; top: 100px; width: 260px; height: 380px; perspective: 1000px; opacity: {{cardOpacity}}; transform: scale({{cardScale}}); transition: opacity 0.4s ease-out, transform 0.4s ease-out">
+      <div style="position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transform: rotateY({{cardRot}}deg); transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)">
+        <div style="position: absolute; inset: 0; box-sizing: border-box; border-radius: 22px; border: 3px solid #B8860B; background: #FFFFFF; padding: 18px; display: flex; flex-direction: column; backface-visibility: hidden; -webkit-backface-visibility: hidden">
+          <div style="display: flex; justify-content: space-between; align-items: center">
+            <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; color: #8A6508">GOLD</span>
+            <span style="font-family: Sora, sans-serif; font-size: 22px; font-weight: 700; padding: 2px 10px; border-radius: 8px; background: #FBF5E4">86</span>
+          </div>
+          <div style="flex: 1; display: flex; align-items: center; justify-content: center">
+            <dc-import name="Shirt" num="20" tier="gold" size="150" hint-size="150px,141px"></dc-import>
+          </div>
+          <div style="font-size: 26px; font-weight: 700">C. Palmer</div>
+          <div style="font-size: 14px; color: #5A6178; margin-top: 2px">MID · CHE</div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid #E3E7EF">
+            <span style="font-size: 12px; color: #5A6178">Form <span style="color: #10153A; font-weight: 600">8 · 2 · 12 · 6 · 9</span></span>
+            <span style="font-size: 12px; color: #5A6178">2 action slots</span>
+          </div>
+        </div>
+        <div style="position: absolute; inset: 0; box-sizing: border-box; border-radius: 22px; border: 3px solid #FFFFFF; background: repeating-linear-gradient(135deg, #10153A 0px, #10153A 14px, #1A2150 14px, #1A2150 28px); display: flex; align-items: center; justify-content: center; transform: rotateY(180deg); backface-visibility: hidden; -webkit-backface-visibility: hidden">
+          <div style="width: 96px; height: 96px; border-radius: 48px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: Sora, sans-serif; font-size: 52px; font-weight: 700; color: #3D5AFE">?</div>
+        </div>
+      </div>
+    </div>
+    <div style="position: absolute; left: 65px; top: 120px; width: 220px; height: 340px; transform: {{packTransform}}; opacity: {{packOpacity}}; transition: transform 0.4s ease-in, opacity 0.4s ease-in; pointer-events: {{packPointer}}">
+      <button type="button" class="{{packClass}}" onClick="{{open}}" aria-label="Open player pack" style="position: relative; width: 100%; height: 100%; padding: 0; border: 3px solid #FFFFFF; border-radius: 20px; background: linear-gradient(135deg, #00D9C0, #3D5AFE); box-shadow: 0 14px 30px rgba(19,23,28,0.18); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; cursor: pointer; font-family: 'DM Sans', sans-serif">
+        <div style="position: absolute; left: 14px; right: 14px; top: 34px; border-top: 2px dashed rgba(255,255,255,0.7)"></div>
+        <div style="width: 96px; height: 96px; border-radius: 48px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: Sora, sans-serif; font-size: 52px; font-weight: 700; color: #3D5AFE">?</div>
+        <div style="font-size: 16px; font-weight: 700; letter-spacing: 0.14em; color: #FFFFFF">PLAYER PACK</div>
+        <div style="font-size: 13px; color: rgba(255,255,255,0.85)">1 player · any position</div>
+      </button>
+    </div>
+    <div style="position: absolute; left: 0; right: 0; top: 500px; text-align: center; font-size: 15px; font-weight: 600; color: #5A6178; opacity: {{promptOpacity}}; transition: opacity 0.2s">Tap the pack to open</div>
+    <div style="position: absolute; left: 0; right: 0; top: 60px; text-align: center; font-size: 14px; font-weight: 700; letter-spacing: 0.2em; color: #8A6508; opacity: {{revealOpacity}}; transition: opacity 0.3s ease-out">GOLD · NEW CARD</div>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 10px; opacity: {{revealOpacity}}; pointer-events: {{buttonsPointer}}; transition: opacity 0.3s ease-out">
+    <a href="Predictions.dc.html" style="display: flex; align-items: center; justify-content: center; height: 54px; border-radius: 14px; background: #10153A; color: #FFFFFF; font-size: 16px; font-weight: 700; text-decoration: none">Put in my five</a>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+      <button type="button" style="height: 48px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E7EF; color: #10153A; font: 600 14px 'DM Sans', sans-serif">Keep in collection</button>
+      <button type="button" style="height: 48px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E7EF; color: #10153A; font: 600 14px 'DM Sans', sans-serif">Swap for a pack</button>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { stage: 'sealed' };
+    this.timers = [];
+  }
+  componentWillUnmount() {
+    this.clearTimers();
+  }
+  clearTimers() {
+    this.timers.forEach((t) => clearTimeout(t));
+    this.timers = [];
+  }
+  later(ms, stage) {
+    this.timers.push(setTimeout(() => this.setState({ stage }), ms));
+  }
+  renderVals() {
+    const s = this.state.stage;
+    const opened = s !== 'sealed' && s !== 'shake';
+    const flipped = s === 'flip' || s === 'revealed';
+    return {
+      revealed: s === 'revealed',
+      notRevealed: s !== 'revealed',
+      packClass: s === 'shake' ? 'shake' : '',
+      packTransform: opened ? 'translateY(-70px) scale(1.08)' : 'translateY(0px) scale(1)',
+      packOpacity: opened ? 0 : 1,
+      packPointer: s === 'sealed' ? 'auto' : 'none',
+      glowScale: opened ? (s === 'burst' ? 1.15 : 1.05) : 0.4,
+      glowOpacity: s === 'burst' ? 0.9 : flipped ? (s === 'revealed' ? 0.35 : 0.55) : 0,
+      cardOpacity: opened ? 1 : 0,
+      cardScale: opened ? 1 : 0.7,
+      cardRot: flipped ? 0 : 180,
+      promptOpacity: s === 'sealed' ? 1 : 0,
+      revealOpacity: s === 'revealed' ? 1 : 0,
+      buttonsPointer: s === 'revealed' ? 'auto' : 'none',
+      open: () => {
+        if (this.state.stage !== 'sealed') return;
+        this.clearTimers();
+        this.setState({ stage: 'shake' });
+        this.later(600, 'burst');
+        this.later(1000, 'flip');
+        this.later(1600, 'revealed');
+      },
+      skip: () => {
+        this.clearTimers();
+        this.setState({ stage: 'revealed' });
+      },
+      replay: () => {
+        this.clearTimers();
+        this.setState({ stage: 'sealed' });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

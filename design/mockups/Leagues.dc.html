@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>League table</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Sora:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3D5AFE}a:hover{color:#2A44D9}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F6FA; color: #10153A; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column">
+  <div style="flex: 1; padding: 22px 16px 12px; display: flex; flex-direction: column; gap: 14px; overflow: hidden">
+    <div style="display: flex; justify-content: space-between; align-items: center">
+      <div style="font-family: Sora, sans-serif; font-size: 24px; font-weight: 700">Leagues</div>
+      <button type="button" style="height: 40px; padding: 0 14px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E7EF; color: #10153A; font: 600 13px 'DM Sans', sans-serif">+ Create or join</button>
+    </div>
+    <div style="display: flex; gap: 8px">
+      <button type="button" style="height: 36px; padding: 0 14px; border-radius: 999px; background: #10153A; border: 0; color: #FFFFFF; font: 600 13px 'DM Sans', sans-serif">Office League</button>
+      <button type="button" style="height: 36px; padding: 0 14px; border-radius: 999px; background: #FFFFFF; border: 1px solid #E3E7EF; color: #10153A; font: 600 13px 'DM Sans', sans-serif">Global</button>
+      <button type="button" style="height: 36px; padding: 0 14px; border-radius: 999px; background: #FFFFFF; border: 1px solid #E3E7EF; color: #10153A; font: 600 13px 'DM Sans', sans-serif">Head-to-head</button>
+    </div>
+    <div style="background: #FFFFFF; border: 1px solid #E3E7EF; border-radius: 16px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 13px; color: #5A6178">Your position</span>
+        <span style="font-family: Sora, sans-serif; font-size: 26px; font-weight: 700">{{you.rank}} <span style="font-size: 15px; color: #5A6178; font-family: 'DM Sans', sans-serif; font-weight: 500">of 14</span></span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px">
+        <span style="font-size: 13px; color: #5A6178">{{gapLabel}}</span>
+        <span style="font-size: 15px; font-weight: 700">{{gapValue}}</span>
+      </div>
+    </div>
+    <div role="tablist" aria-label="Table view" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: 12px; background: #E6EAF2">
+      <button type="button" role="tab" aria-selected="{{seasonSel}}" onClick="{{showSeason}}" style="height: 36px; border-radius: 9px; border: 0; background: {{seasonBg}}; color: #10153A; font: 600 13px 'DM Sans', sans-serif; cursor: pointer">Season</button>
+      <button type="button" role="tab" aria-selected="{{weekSel}}" onClick="{{showWeek}}" style="height: 36px; border-radius: 9px; border: 0; background: {{weekBg}}; color: #10153A; font: 600 13px 'DM Sans', sans-serif; cursor: pointer">This week (GW12)</button>
+    </div>
+    <div style="background: #FFFFFF; border: 1px solid #E3E7EF; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column">
+      <div style="display: grid; grid-template-columns: 40px 18px minmax(0, 1fr) 46px 52px; gap: 6px; align-items: center; padding: 8px 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: #5A6178; background: #F4F6FA">
+        <span>POS</span><span></span><span>MANAGER</span><span style="text-align: right">GW</span><span style="text-align: right">TOTAL</span>
+      </div>
+      <sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+        <div style="display: grid; grid-template-columns: 40px 18px minmax(0, 1fr) 46px 52px; gap: 6px; align-items: center; min-height: 52px; padding: 0 12px; background: {{r.bg}}; border-top: 1px solid #EEF1F6">
+          <span style="font-family: Sora, sans-serif; font-size: 16px; font-weight: 700">{{r.rank}}</span>
+          <span style="font-size: 11px; font-weight: 700; color: {{r.moveColor}}" aria-label="{{r.moveLabel}}">{{r.move}}</span>
+          <span style="display: flex; flex-direction: column; min-width: 0">
+            <span style="font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span>
+            <span style="font-size: 12px; color: #5A6178; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.team}}</span>
+          </span>
+          <span style="text-align: right; font-size: 14px; font-weight: {{r.gwWeight}}">{{r.gw}}</span>
+          <span style="text-align: right; font-size: 14px; font-weight: {{r.totalWeight}}">{{r.total}}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 4px">
+      <span style="font-size: 13px; color: #5A6178">Showing top 8 of 14</span>
+      <a href="History.dc.html" style="font-size: 14px; font-weight: 600; text-decoration: none">My season</a>
+    </div>
+  </div>
+  <dc-import name="TabBar" active="leagues" hint-size="390px,76px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { view: 'season' };
+  }
+  renderVals() {
+    const view = this.state.view;
+    const managers = [
+      { name: 'Sam K.', team: 'Kick Hazard', gw: 39, total: 494, prev: 1 },
+      { name: 'You', team: 'Layton’s Five', gw: 66, total: 478, prev: 3, me: true },
+      { name: 'Priya M.', team: 'Saka Potatoes', gw: 44, total: 474, prev: 2 },
+      { name: 'Tom R.', team: 'Net Gains', gw: 51, total: 456, prev: 4 },
+      { name: 'Jess L.', team: 'Bold Choices', gw: 58, total: 449, prev: 7 },
+      { name: 'Dan W.', team: 'Clean Sheet Club', gw: 22, total: 431, prev: 5 },
+      { name: 'Mo A.', team: 'Captain Chaos', gw: 30, total: 425, prev: 6 },
+      { name: 'Ellie P.', team: 'Tackle Box', gw: 37, total: 410, prev: 8 }
+    ];
+    const sorted = view === 'season'
+      ? managers.slice().sort((a, b) => b.total - a.total)
+      : managers.slice().sort((a, b) => b.gw - a.gw);
+    const rows = sorted.map((m, i) => {
+      const rank = i + 1;
+      const delta = view === 'season' ? m.prev - rank : 0;
+      return {
+        rank, name: m.name, team: m.team, gw: m.gw, total: m.total,
+        move: view === 'season' ? (delta > 0 ? '▲' + delta : delta < 0 ? '▼' + (-delta) : '–') : '',
+        moveColor: delta > 0 ? '#3D5AFE' : delta < 0 ? '#C2410C' : '#5A6178',
+        moveLabel: delta > 0 ? 'up ' + delta : delta < 0 ? 'down ' + (-delta) : 'no change',
+        bg: m.me ? '#E0FBF7' : '#FFFFFF',
+        gwWeight: view === 'week' ? 700 : 500,
+        totalWeight: view === 'season' ? 700 : 500
+      };
+    });
+    const youRow = rows.find((r) => r.name === 'You');
+    return {
+      rows,
+      you: youRow,
+      gapLabel: view === 'season' ? 'Behind 1st' : 'Week winner',
+      gapValue: view === 'season' ? '16 pts' : 'You, 66 pts',
+      seasonBg: view === 'season' ? '#FFFFFF' : 'transparent',
+      weekBg: view === 'week' ? '#FFFFFF' : 'transparent',
+      seasonSel: view === 'season' ? 'true' : 'false',
+      weekSel: view === 'week' ? 'true' : 'false',
+      showSeason: () => this.setState({ view: 'season' }),
+      showWeek: () => this.setState({ view: 'week' })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+node_modules
+dist
+.turbo
+.expo
+*.log
+.env
+.env.*
+!.env.example
+apps/api/.data
+coverage
+data/raw
+__pycache__
+web-build

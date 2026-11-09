@@ -1,0 +1,47 @@
+{
+  "version": "0.1",
+  "status": "working values from mockups; confirm with simulation re-run",
+  "currencies": {
+    "season_points": "league score, never spent, resets each August",
+    "coins": "earned 1 per point scored; spent on packs and swaps; never affects ranking"
+  },
+  "prices_coins": {
+    "player_pack": 100,
+    "card_swap": 60,
+    "squad_pack": 400
+  },
+  "free_rewards": {
+    "starter_pack": "once on sign-up: 5 players in squad shape, same tier, one guaranteed stronger card",
+    "weekly_free_pack": "one player pack per gameweek, unlocked by confirming that week's actions"
+  },
+  "season_milestones": [
+    {
+      "season_points": 250,
+      "reward": "silver_pack"
+    },
+    {
+      "season_points": 500,
+      "reward": "gold_pack"
+    },
+    {
+      "season_points": 750,
+      "reward": "gold_pack"
+    },
+    {
+      "season_points": 1000,
+      "reward": "elite_pack"
+    }
+  ],
+  "compensation": {
+    "player_leaves_pl": "free swap pack of same rarity",
+    "club_relegated": "free swap pack per card, same rarity",
+    "retired": "free swap pack of same rarity"
+  },
+  "pack_odds": "to be set; must be logged per opening and visible on the pack",
+  "never": [
+    "cash out",
+    "real-money trading of cards",
+    "real-money prizes on paid entry",
+    "paid purchases of any kind in the MVP test"
+  ]
+}

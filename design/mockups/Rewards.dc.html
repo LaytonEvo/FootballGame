@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Coins and packs</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Sora:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3D5AFE}a:hover{color:#2A44D9}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F6FA; color: #10153A; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column">
+  <div style="flex: 1; padding: 22px 16px 12px; display: flex; flex-direction: column; gap: 12px; overflow: hidden">
+    <div style="display: flex; justify-content: space-between; align-items: center">
+      <div style="font-family: Sora, sans-serif; font-size: 24px; font-weight: 700">Coins &amp; packs</div>
+      <button type="button" style="height: 40px; padding: 0 12px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E7EF; color: #10153A; font: 600 13px 'DM Sans', sans-serif">History</button>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+      <div style="background: #FFFFFF; border: 1px solid #E3E7EF; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 12px; color: #5A6178">Coins to spend</span>
+        <span style="font-family: Sora, sans-serif; font-size: 28px; font-weight: 700">{{coins}}</span>
+        <span style="font-size: 11px; color: #5A6178">1 Coin per point scored</span>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #E3E7EF; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 12px; color: #5A6178">Season points</span>
+        <span style="font-family: Sora, sans-serif; font-size: 28px; font-weight: 700">{{seasonPts}}</span>
+        <span style="font-size: 11px; color: #5A6178">Your league score · never spent</span>
+      </div>
+    </div>
+    <div style="background: #FFFFFF; border: 1.5px solid #3D5AFE; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <span style="font-size: 15px; font-weight: 700">Next player pack</span>
+        <span style="font-size: 13px; font-weight: 700; color: #3D5AFE">{{toGo}} Coins to go</span>
+      </div>
+      <div role="progressbar" aria-label="Coins towards next player pack" aria-valuemin="0" aria-valuemax="{{packPrice}}" aria-valuenow="{{coins}}" style="height: 12px; border-radius: 6px; background: #E6EAF2; overflow: hidden">
+        <div style="width: {{packPct}}%; height: 100%; border-radius: 6px; background: #10153A"></div>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-size: 12px; color: #5A6178">
+        <span>{{coins}} / {{packPrice}} Coins</span>
+        <span>About one more gameweek</span>
+      </div>
+    </div>
+    <div style="background: #FFFFFF; border: 1px solid #E3E7EF; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <span style="font-size: 15px; font-weight: 700">Season milestones</span>
+        <span style="font-size: 13px; color: #5A6178">{{nextMilestoneText}}</span>
+      </div>
+      <div style="position: relative; height: 34px">
+        <div style="position: absolute; left: 0; right: 0; top: 13px; height: 8px; border-radius: 4px; background: #E6EAF2"></div>
+        <div style="position: absolute; left: 0; top: 13px; width: {{seasonPct}}%; height: 8px; border-radius: 4px; background: #10153A"></div>
+        <sc-for list="{{milestones}}" as="m" hint-placeholder-count="4">
+          <div style="position: absolute; left: {{m.left}}%; top: 3px; width: 28px; height: 28px; margin-left: -14px; border-radius: 14px; background: {{m.bg}}; border: 2.5px solid {{m.color}}; box-sizing: border-box; display: flex; align-items: center; justify-content: center">
+            <sc-if value="{{m.done}}" hint-placeholder-val="{{false}}">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Unlocked"><path d="M5 12l5 5 9-10"></path></svg>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px">
+        <sc-for list="{{milestones}}" as="m" hint-placeholder-count="4">
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 1px; text-align: right">
+            <span style="font-size: 12px; font-weight: 700">{{m.pts}}</span>
+            <span style="font-size: 11px; color: {{m.labelColor}}; font-weight: 600">{{m.reward}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="background: #FFFFFF; border: 1px solid #E3E7EF; border-radius: 14px; padding: 10px 12px; display: flex; align-items: center; gap: 12px">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#3D5AFE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"></rect><path d="M3 9h18M8 2v4M16 2v4"></path></svg>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 1px">
+        <span style="font-size: 14px; font-weight: 600">Weekly free pack</span>
+        <span style="font-size: 12px; color: #5A6178">Set your GW13 actions to unlock it</span>
+      </div>
+      <span style="font-size: 12px; font-weight: 700; color: #5A6178">Mon</span>
+    </div>
+    <div style="background: #FFFFFF; border: 1px solid #E3E7EF; border-radius: 16px; display: flex; flex-direction: column">
+      <sc-for list="{{shop}}" as="s" hint-placeholder-count="3">
+        <div style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 12px; border-top: 1px solid {{s.divider}}">
+          <div style="width: 30px; height: 40px; border-radius: 6px; background: {{s.packBg}}; border: 2px solid {{s.packBorder}}; box-sizing: border-box"></div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 1px">
+            <span style="font-size: 14px; font-weight: 600">{{s.name}}</span>
+            <span style="font-size: 12px; color: #5A6178">{{s.desc}}</span>
+          </div>
+          <button type="button" style="min-width: 84px; height: 40px; padding: 0 10px; border-radius: 10px; border: {{s.btnBorder}}; background: {{s.btnBg}}; color: {{s.btnColor}}; font: 700 13px 'DM Sans', sans-serif">{{s.btn}}</button>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  <dc-import name="TabBar" active="collection" hint-size="390px,76px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const coins = 86, packPrice = 100, seasonPts = 478, maxPts = 1000;
+    const ms = [
+      { pts: 250, reward: 'Silver pack', color: '#7C8796' },
+      { pts: 500, reward: 'Gold pack', color: '#B8860B' },
+      { pts: 750, reward: 'Gold pack', color: '#B8860B' },
+      { pts: 1000, reward: 'Elite pack', color: '#6A55E0' }
+    ];
+    const next = ms.find((m) => m.pts > seasonPts);
+    const milestones = ms.map((m) => {
+      const done = seasonPts >= m.pts;
+      return { ...m, done, left: (m.pts / maxPts) * 100 - (m.pts === maxPts ? 2 : 0), bg: done ? m.color : '#FFFFFF', labelColor: done ? '#5A6178' : m.color };
+    });
+    const canAfford = (price) => coins >= price;
+    const shopItems = [
+      { name: 'Player pack', desc: '1 player, any position', price: 100, packBg: '#E0FBF7', packBorder: '#3D5AFE' },
+      { name: 'Card swap', desc: 'Trade a card for a same-rarity pack', price: 60, packBg: '#F4F6FA', packBorder: '#7C8796' },
+      { name: 'Squad pack', desc: '5 players in the squad shape', price: 400, packBg: '#FBF5E4', packBorder: '#B8860B' }
+    ];
+    const shop = shopItems.map((s, i) => {
+      const ok = canAfford(s.price);
+      return {
+        ...s,
+        divider: i === 0 ? 'transparent' : '#EEF1F6',
+        btn: ok ? s.price + ' Coins' : (s.price - coins) + ' to go',
+        btnBg: ok ? '#3D5AFE' : '#F4F6FA',
+        btnColor: ok ? '#FFFFFF' : '#5A6178',
+        btnBorder: ok ? '0' : '1px solid #E3E7EF'
+      };
+    });
+    return {
+      coins, packPrice, seasonPts,
+      toGo: packPrice - coins,
+      packPct: Math.round((coins / packPrice) * 100),
+      seasonPct: (seasonPts / maxPts) * 100,
+      nextMilestoneText: next ? (next.pts - seasonPts) + ' pts to ' + next.reward : 'All unlocked',
+      milestones,
+      shop
+    };
+  }
+}
+</script>
+</body>
+</html>

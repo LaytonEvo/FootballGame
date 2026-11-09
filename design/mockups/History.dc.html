@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>My season points per gameweek</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Sora:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3D5AFE}a:hover{color:#2A44D9}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F6FA; color: #10153A; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column">
+  <div style="flex: 1; padding: 20px 16px 12px; display: flex; flex-direction: column; gap: 14px; overflow: hidden">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <a href="Leagues.dc.html" aria-label="Back to Leagues" style="width: 44px; height: 44px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E7EF; box-sizing: border-box; display: flex; align-items: center; justify-content: center; color: #10153A">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+      </a>
+      <div style="font-family: Sora, sans-serif; font-size: 22px; font-weight: 700">My season</div>
+    </div>
+    <div style="display: flex; align-items: flex-end; gap: 10px">
+      <div style="font-family: Sora, sans-serif; font-size: 56px; font-weight: 700; line-height: 0.9; letter-spacing: -0.03em">{{total}}</div>
+      <div style="font-size: 15px; color: #5A6178; padding-bottom: 4px">pts after 12 gameweeks</div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+      <div style="background: #FFFFFF; border: 1px solid #E3E7EF; border-radius: 12px; padding: 8px 10px; display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 11px; color: #5A6178">Avg per week</span>
+        <span style="font-size: 15px; font-weight: 700">{{avg}}</span>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #E3E7EF; border-radius: 12px; padding: 8px 10px; display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 11px; color: #5A6178">Best week</span>
+        <span style="font-size: 15px; font-weight: 700">{{best}}</span>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #E3E7EF; border-radius: 12px; padding: 8px 10px; display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 11px; color: #5A6178">Office League</span>
+        <span style="font-size: 15px; font-weight: 700">2nd</span>
+      </div>
+    </div>
+    <div style="background: #FFFFFF; border: 1px solid #E3E7EF; border-radius: 16px; padding: 14px 12px 10px; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 4px">
+        <span style="font-size: 14px; font-weight: 600">Points per gameweek</span>
+        <span style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #5A6178"><span style="width: 14px; height: 3px; border-radius: 2px; background: #10153A"></span>League average</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; align-items: end; height: 170px">
+        <sc-for list="{{weeks}}" as="w" hint-placeholder-count="12">
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 3px; height: 100%">
+            <span style="font-size: 10px; font-weight: 700; color: {{w.labelColor}}">{{w.pts}}</span>
+            <div style="position: relative; width: 100%; height: {{w.h}}px; border-radius: 4px 4px 0 0; background: {{w.color}}">
+              <div style="position: absolute; left: -2px; right: -2px; bottom: {{w.avgPx}}px; height: 3px; border-radius: 2px; background: #10153A"></div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px">
+        <sc-for list="{{weeks}}" as="w" hint-placeholder-count="12">
+          <span style="text-align: center; font-size: 10px; color: #5A6178">{{w.gw}}</span>
+        </sc-for>
+      </div>
+    </div>
+    <div style="background: #FFFFFF; border: 1px solid #E3E7EF; border-radius: 16px; display: flex; flex-direction: column">
+      <sc-for list="{{recent}}" as="r" hint-placeholder-count="3">
+        <a href="Recap.dc.html" style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 52px 40px; gap: 8px; align-items: center; min-height: 52px; padding: 0 14px; border-top: 1px solid {{r.divider}}; color: #10153A; text-decoration: none">
+          <span style="font-size: 13px; font-weight: 700">{{r.gw}}</span>
+          <span style="font-size: 13px; color: #5A6178">{{r.landed}}</span>
+          <span style="font-size: 12px; font-weight: 700; color: {{r.moveColor}}">{{r.move}}</span>
+          <span style="font-family: Sora, sans-serif; font-size: 16px; font-weight: 700; text-align: right">{{r.pts}}</span>
+        </a>
+      </sc-for>
+    </div>
+  </div>
+  <dc-import name="TabBar" active="leagues" hint-size="390px,76px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const mine = [38, 29, 45, 31, 52, 27, 40, 36, 44, 36, 34, 66];
+    const league = [33, 31, 39, 34, 41, 30, 37, 35, 38, 33, 32, 44];
+    const scale = 2;
+    const total = mine.reduce((s, v) => s + v, 0);
+    const bestPts = Math.max(...mine);
+    const bestGw = mine.indexOf(bestPts) + 1;
+    const weeks = mine.map((pts, i) => ({
+      gw: i + 1,
+      pts,
+      h: pts * scale,
+      avgPx: league[i] * scale - 2,
+      color: pts === bestPts ? '#3D5AFE' : '#B9C6FF',
+      labelColor: pts === bestPts ? '#3D5AFE' : '#5A6178'
+    }));
+    const recent = [
+      { gw: 'GW12', landed: '6 of 8 actions landed', move: '▲1', moveColor: '#3D5AFE', pts: 66 },
+      { gw: 'GW11', landed: '5 of 9 actions landed', move: '–', moveColor: '#5A6178', pts: 34 },
+      { gw: 'GW10', landed: '5 of 10 actions landed', move: '▼1', moveColor: '#C2410C', pts: 36 }
+    ];
+    return {
+      total,
+      avg: (total / mine.length).toFixed(1),
+      best: 'GW' + bestGw + ' · ' + bestPts,
+      weeks,
+      recent: recent.map((r, i) => ({ ...r, divider: i === 0 ? 'transparent' : '#EEF1F6' }))
+    };
+  }
+}
+</script>
+</body>
+</html>

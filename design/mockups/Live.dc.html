@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Home matchday live</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Sora:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3D5AFE}a:hover{color:#2A44D9}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F6FA; color: #10153A; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column">
+  <div style="flex: 1; padding: 22px 16px 12px; display: flex; flex-direction: column; gap: 12px; overflow: hidden">
+    <div style="display: flex; justify-content: space-between; align-items: center">
+      <div style="display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 999px; background: #E0FBF7; color: #3D5AFE; font-size: 12px; font-weight: 700; letter-spacing: 0.08em">
+        <span style="width: 8px; height: 8px; border-radius: 4px; background: #00B8A3"></span>LIVE · GW12
+      </div>
+      <div style="font-size: 12px; color: #5A6178">Provisional until Mon 09:00</div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px">
+      <div style="display: flex; align-items: flex-end; gap: 8px">
+        <div style="font-family: Sora, sans-serif; font-size: 60px; font-weight: 700; line-height: 0.9; letter-spacing: -0.03em">40</div>
+        <div style="font-size: 15px; color: #5A6178; padding-bottom: 4px">pts</div>
+      </div>
+      <div style="margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 2px">
+        <span style="font-size: 14px; font-weight: 700">Office League 2nd <span style="color: #3D5AFE">▲2</span></span>
+        <span style="font-size: 13px; color: #5A6178">Global top 15%</span>
+      </div>
+    </div>
+    <div style="background: #E0FBF7; border: 1.5px solid #00B8A3; border-radius: 14px; padding: 10px 14px; display: flex; align-items: center; gap: 12px">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#00B8A3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M7.5 12.5l3 3 6-7"></path></svg>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 1px">
+        <span style="font-size: 15px; font-weight: 700">Saka assist landed</span>
+        <span style="font-size: 12px; color: #2F5A55">Bold action doubled · 58’</span>
+      </div>
+      <span style="font-family: Sora, sans-serif; font-size: 22px; font-weight: 700; color: #3D5AFE">+30</span>
+    </div>
+    <div style="height: 456px; position: relative; border-radius: 18px; overflow: hidden; background: #13B556; box-shadow: 0 2px 10px rgba(16,21,58,0.12)"><div style="position: absolute; left: -36px; right: -36px; top: 0px; height: 470px; transform: perspective(700px) rotateX(18deg); transform-origin: 50% 0%; background: repeating-linear-gradient(180deg, #13B556 0px, #13B556 44px, #10AB50 44px, #10AB50 88px)"><div style="position: absolute; left: 30px; right: 30px; top: 8px; bottom: 8px; border: 2px solid rgba(255,255,255,0.75)"></div><div style="position: absolute; left: 50%; width: 170px; margin-left: -85px; top: 8px; height: 52px; border: 2px solid rgba(255,255,255,0.75); border-top: 0"></div><div style="position: absolute; left: 50%; width: 170px; margin-left: -85px; bottom: 8px; height: 52px; border: 2px solid rgba(255,255,255,0.75); border-bottom: 0"></div><div style="position: absolute; left: 30px; right: 30px; top: 228px; height: 2px; background: rgba(255,255,255,0.75)"></div><div style="position: absolute; left: 50%; width: 84px; height: 84px; margin-left: -42px; top: 187px; border: 2px solid rgba(255,255,255,0.75); border-radius: 50%"></div></div>
+    <sc-for list="{{players}}" as="p" hint-placeholder-count="5">
+        <div style="position: absolute; left: {{p.left}}px; top: {{p.top}}px; width: 180px; display: flex; flex-direction: column; align-items: center; gap: 4px">
+          <div style="position: relative; width: 48px; height: 45px">
+            <dc-import name="Shirt" num="{{p.num}}" tier="{{p.tier}}" size="56" hint-size="56px,52px"></dc-import>
+            <div style="position: absolute; left: -26px; top: 6px; min-width: 30px; height: 22px; padding: 0 6px; box-sizing: border-box; border-radius: 11px; background: #10153A; color: #FFFFFF; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center">{{p.pts}}</div>
+            <sc-if value="{{p.captain}}" hint-placeholder-val="{{false}}">
+              <div style="position: absolute; right: -8px; top: -4px; width: 20px; height: 20px; border-radius: 10px; background: #10153A; color: #FFFFFF; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center">C</div>
+            </sc-if>
+          </div>
+          <div style="min-width: 78px; border-radius: 5px; overflow: hidden; box-shadow: 0 1px 4px rgba(16,21,58,0.28); text-align: center"><div style="background: #FFFFFF; color: #10153A; font-size: 12px; font-weight: 700; padding: 2px 8px">{{p.name}}</div><div style="background: #EEF1F6; color: #10153A; font-size: 10px; font-weight: 600; padding: 1px 8px">{{p.match}}</div></div>
+          <div style="display: flex; gap: 4px; justify-content: center">
+            <sc-for list="{{p.chips}}" as="c" hint-placeholder-count="2">
+              <div style="height: 24px; padding: 0 7px; border-radius: 7px; background: {{c.bg}}; border: 1.5px solid {{c.border}}; color: {{c.color}}; font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 4px; white-space: nowrap">
+                <sc-if value="{{c.hit}}" hint-placeholder-val="{{false}}">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Landed"><path d="M5 12l5 5 9-10"></path></svg>
+                </sc-if>
+                <sc-if value="{{c.miss}}" hint-placeholder-val="{{false}}">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Missed"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+                </sc-if>
+                <sc-if value="{{c.pending}}" hint-placeholder-val="{{true}}">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Pending"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+                </sc-if>
+                <span>{{c.label}}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  <dc-import name="TabBar" active="home" hint-size="390px,76px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const hit = (label) => ({ label, hit: true, miss: false, pending: false, bg: '#E0FBF7', border: '#00B8A3', color: '#046C61' });
+    const miss = (label) => ({ label, hit: false, miss: true, pending: false, bg: '#FFF1E8', border: '#C2410C', color: '#9A3412' });
+    const wait = (label) => ({ label, hit: false, miss: false, pending: true, bg: '#FFFFFF', border: '#FFFFFF', color: '#5A6178' });
+    const gold = '#B8860B', silver = '#7C8796', elite = '#6A55E0';
+    return {
+      players: [
+        { num: 9, name: 'Haaland', match: '20:00', tier: 'elite', captain: true, pts: '0', left: 89, top: 8, chips: [wait('Goal'), wait('2+ goals')] },
+        { num: 7, name: 'Saka', match: '1–0 · 62’', tier: 'gold', captain: false, pts: '+30', left: 0, top: 118, chips: [hit('Assist +30')] },
+        { num: 8, name: 'Fernandes', match: '0–0 · 40’', tier: 'silver', captain: false, pts: '0', left: 178, top: 118, chips: [wait('Goal inv.')] },
+        { num: 4, name: 'Van Dijk', match: '2–0 · 75’', tier: 'gold', captain: false, pts: '+7', left: 89, top: 228, chips: [wait('Clean sheet'), hit('Def. actions +7')] },
+        { num: 1, name: 'Pickford', match: '1–1 · FT', tier: 'silver', captain: false, pts: '+3', left: 89, top: 338, chips: [hit('3+ saves +3'), miss('Clean sheet')] }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
