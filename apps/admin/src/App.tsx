@@ -593,19 +593,18 @@ function Users() {
 function Packs() {
   const [userId, setUserId] = useState('');
   const [path, setPath] = useState('/admin/packs?limit=100');
-  const logs =
-    useLoad<
-      {
-        id: string;
-        userId: string;
-        type: string;
-        source: string;
-        openedAt: string;
-        oddsVersion: string;
-        seed: string;
-        result: unknown;
-      }[]
-    >(path);
+  const logs = useLoad<
+    {
+      id: string;
+      userId: string;
+      type: string;
+      source: string;
+      openedAt: string;
+      oddsVersion: string;
+      seed: string;
+      result: unknown;
+    }[]
+  >(path);
   return (
     <section>
       <h2>Pack-open log</h2>

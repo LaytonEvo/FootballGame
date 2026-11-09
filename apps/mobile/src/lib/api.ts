@@ -1,6 +1,10 @@
 import Constants from 'expo-constants';
 
-export const API_URL = (Constants.expoConfig?.extra?.apiUrl as string | undefined) ?? 'http://localhost:3000';
+// EXPO_PUBLIC_API_URL is inlined at build time (Railway web preview, EAS builds); app.json extra is the local default.
+export const API_URL =
+  process.env.EXPO_PUBLIC_API_URL ??
+  (Constants.expoConfig?.extra?.apiUrl as string | undefined) ??
+  'http://localhost:3000';
 
 export class ApiError extends Error {
   constructor(

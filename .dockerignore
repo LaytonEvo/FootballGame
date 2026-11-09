@@ -1,0 +1,9 @@
+**/node_modules
+**/.turbo
+**/dist
+**/.expo
+**/web-build
+apps/api/.data
+data/raw
+.git
+docs/screenshots

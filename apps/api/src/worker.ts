@@ -13,6 +13,9 @@ async function run(name: string) {
   console.log(JSON.stringify({ job: name, ms: Date.now() - t0, summary: summarise(out) }));
 }
 
+// Always refresh reference data on boot (idempotent), so a fresh database is usable straight away.
+await run('sync');
+
 if (process.env.REDIS_URL) {
   const { Queue, Worker } = await import('bullmq');
   const { default: IORedis } = await import('ioredis');
@@ -24,7 +27,6 @@ if (process.env.REDIS_URL) {
   console.log('worker: BullMQ schedulers registered');
 } else {
   console.log('worker: no REDIS_URL, running in-process loop');
-  await run('sync');
   const loop = async () => {
     await run('tick').catch((e) => console.error(e));
     setTimeout(loop, 60_000);
