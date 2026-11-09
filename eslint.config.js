@@ -13,6 +13,7 @@ export default tseslint.config(
       'data/**',
       'apps/mobile/babel.config.js',
       'apps/mobile/metro.config.js',
+      'apps/mobile/e2e/**',
     ],
   },
   js.configs.recommended,

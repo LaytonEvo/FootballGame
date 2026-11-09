@@ -6,6 +6,7 @@ import type { AppContext } from './context.js';
 import { HttpError } from './errors.js';
 import { authRoutes } from './routes/auth.js';
 import { cardRoutes } from './routes/cards.js';
+import { pickRoutes } from './routes/picks.js';
 import { getEconomy, getScoringConfig } from './services/config.js';
 
 export async function buildApp(ctx: AppContext) {
@@ -31,5 +32,6 @@ export async function buildApp(ctx: AppContext) {
   });
   authRoutes(app, ctx);
   cardRoutes(app, ctx);
+  pickRoutes(app, ctx);
   return app;
 }

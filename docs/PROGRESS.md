@@ -74,6 +74,27 @@ One short note per phase. Assumptions that need a product decision are collected
   the squad (auto-filled from the collection where possible), free same-rarity swap pack. Returned → reactivated
   (owner keeps the swap pack). `relegateClub` / `promoteClub` for season end.
 
+## Phase 4 — Picking actions ✅ (usability run still to do with real testers)
+
+- API: `GET /picks` (slots with "v ARS (H)" fixture context, every basic-feed action grouped by tier with
+  points and a form hint like "3+ saves in 3 of last 5", current selection, potential points),
+  `POST /picks/suggest` (`last_week` / `auto`), `POST /picks/:gw/confirm` (validated by the same engine;
+  re-confirm allowed until the deadline; **409 `locked` from the deadline on, using the server clock only**).
+  Confirming unlocks that week's free player pack once. `GET /home` aggregates the Home screen.
+- Missed deadline: last week's actions carry over at lock (tested), with Auto-pick filling new players.
+- Mobile (Expo Router): sign-in → code → profile (16+, disclaimer, privacy summary) → sealed starter pack →
+  reveal → guided pick screen (opens the striker's sheet) → Auto-pick → captain → Confirm → Home countdown.
+  Pitch view (FWD, MID MID, DEF, GK, sub strip), kit-style shirts in rarity colours (no crests or kits),
+  action sheet grouped Likely / Possible / Bold / Long shot / Chaos with "+N pts", hints, captain switch and
+  bold toggle ("double if it lands, −N if not"); long-press a chip to mark bold. Theme from `design/tokens.json`.
+- Pick-state logic (`apps/mobile/src/features/picks/state.ts`) is pure and unit-tested; it reuses
+  `@ff/scoring` so the client shows the same validation and potential points as the server.
+- Verified in headless Chromium against the real API and the replayed dataset (`apps/mobile/e2e/onboarding.cjs`):
+  phone → confirmed actions with no console errors; screenshots in `docs/screenshots/`. The "<60 s for a
+  returning player" target needs a real usability run on devices: returning players need two taps
+  (Same as last week → Confirm).
+- Analytics: `pick_started` and `actions_confirmed` (with server-measured `pickMs`).
+
 ## Assumptions to confirm
 
 | #   | Rule                                     | What the build does now                                                                                                       | Where               |

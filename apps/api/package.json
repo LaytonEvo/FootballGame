@@ -8,6 +8,7 @@
     "start": "tsx src/main.ts",
     "worker": "tsx src/worker.ts",
     "seed": "tsx src/seed.ts",
+    "dev:sync": "tsx src/dev-sync.ts",
     "db:generate": "drizzle-kit generate",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json"

@@ -39,13 +39,11 @@ export async function verifySignIn(ctx: AppContext, rawPhone: string, code: stri
       .returning();
   }
   const token = randomBytes(32).toString('base64url');
-  await ctx.db
-    .insert(sessions)
-    .values({
-      tokenHash: sha256(token),
-      userId: user!.id,
-      expiresAt: new Date(now.getTime() + SESSION_TTL_MS),
-    });
+  await ctx.db.insert(sessions).values({
+    tokenHash: sha256(token),
+    userId: user!.id,
+    expiresAt: new Date(now.getTime() + SESSION_TTL_MS),
+  });
   await track(ctx.db, now, user!.id, 'signup_verified', { isNew });
   return { token, user: publicUser(user!), isNew };
 }

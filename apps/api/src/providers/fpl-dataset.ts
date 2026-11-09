@@ -79,17 +79,27 @@ export class FplDatasetProvider implements DataProvider {
         if (!l || m.kickoff > l.kickoff) latest.set(m.playerId, m);
       }
     }
-    return [...first.values()].map((f) => {
-      const cur = latest.get(f.playerId) ?? f;
-      return {
-        ref: `fpl:p${f.playerId}`,
-        name: f.name,
-        position: f.position,
-        clubRef: `fpl:t${cur.teamId}`,
-        shirtNumber: null,
-        rating: f.value,
-      };
-    });
+    // Only players registered by now (pre-season: the GW1 squads).
+    const gw1End = Math.max(
+      ...this.ds.fixtures
+        .filter((f) => f.gameweek === 1 && f.kickoff)
+        .map((f) => this.shifted(f.kickoff!).getTime()),
+    );
+    // A week of look-ahead: a debutant is registered before the deadline of the week they first play.
+    const cutoff = Math.max(now + 7 * DAY, gw1End);
+    return [...first.values()]
+      .filter((f) => this.shifted(f.kickoff).getTime() <= cutoff)
+      .map((f) => {
+        const cur = latest.get(f.playerId) ?? f;
+        return {
+          ref: `fpl:p${f.playerId}`,
+          name: f.name,
+          position: f.position,
+          clubRef: `fpl:t${cur.teamId}`,
+          shirtNumber: null,
+          rating: f.value,
+        };
+      });
   }
 
   private status(f: Dataset['fixtures'][number]): MatchStatus {

@@ -5,3 +5,4 @@ pnpm-lock.yaml
 **/.expo
 tools/sim/baseline
 AGENTS.md
+apps/mobile/e2e

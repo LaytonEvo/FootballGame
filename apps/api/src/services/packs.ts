@@ -212,17 +212,15 @@ export async function openPack(
         continue;
       }
       const cardId = newId();
-      await tx
-        .insert(cards)
-        .values({
-          id: cardId,
-          userId,
-          playerId: player.id,
-          rarity,
-          rating: player.rating,
-          clubAtOpeningId: player.clubId,
-          packId: pack.id,
-        });
+      await tx.insert(cards).values({
+        id: cardId,
+        userId,
+        playerId: player.id,
+        rarity,
+        rating: player.rating,
+        clubAtOpeningId: player.clubId,
+        packId: pack.id,
+      });
       results.push({
         cardId,
         playerId: player.id,

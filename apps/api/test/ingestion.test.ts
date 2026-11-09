@@ -171,7 +171,11 @@ describe('gameweek ingestion and lifecycle', () => {
     const perGw = (n: number) => ds.fixtures.filter((f) => f.gameweek === n).length;
     expect(perGw(26)).toBe(11);
     expect(perGw(31)).toBe(8);
-    const t = await datasetCtx([26]);
+    // Start the clock a week before GW26 so mid-season signings are registered.
+    const gw26Start = Math.min(
+      ...ds.fixtures.filter((f) => f.gameweek === 26).map((f) => new Date(f.kickoff!).getTime()),
+    );
+    const t = await datasetCtx([26], new Date(gw26Start + (364 - 7) * 24 * HOUR).toISOString());
     close = t.close;
     const fx = ds.fixtures.filter((f) => f.gameweek === 26);
     const counts = new Map<number, number>();

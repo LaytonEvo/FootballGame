@@ -55,16 +55,14 @@ describe('transfers and leaving the league', () => {
     const spare = (await t.db.select().from(players).where(eq(players.position, 'MID'))).find(
       (p) => p.clubId && p.id !== mid.playerId && p.rating < 60,
     )!;
-    await t.db
-      .insert(cards)
-      .values({
-        id: 'spare-card',
-        userId: u.userId,
-        playerId: spare.id,
-        rarity: 'bronze',
-        rating: spare.rating,
-        clubAtOpeningId: spare.clubId,
-      });
+    await t.db.insert(cards).values({
+      id: 'spare-card',
+      userId: u.userId,
+      playerId: spare.id,
+      rarity: 'bronze',
+      rating: spare.rating,
+      clubAtOpeningId: spare.clubId,
+    });
 
     const gw2 = await gw(2);
     t.clock.set(new Date(gw2.deadlineAt.getTime() - 24 * 60 * MINUTE));
