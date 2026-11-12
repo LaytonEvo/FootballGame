@@ -125,13 +125,11 @@ export async function guestSignIn(ctx: AppContext) {
     .values({ id: newId(), phoneHash: `guest:${newId()}`, inviteCode: shortCode(8) })
     .returning();
   const token = randomBytes(32).toString('base64url');
-  await ctx.db
-    .insert(sessions)
-    .values({
-      tokenHash: sha256(token),
-      userId: user!.id,
-      expiresAt: new Date(now.getTime() + SESSION_TTL_MS),
-    });
+  await ctx.db.insert(sessions).values({
+    tokenHash: sha256(token),
+    userId: user!.id,
+    expiresAt: new Date(now.getTime() + SESSION_TTL_MS),
+  });
   await track(ctx.db, now, user!.id, 'signup_verified', { isNew: true, guest: true });
   return { token, user: publicUser(user!), isNew: true };
 }

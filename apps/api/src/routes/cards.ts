@@ -8,6 +8,7 @@ import { listPacks, oddsFor, openPack } from '../services/packs.js';
 import { getSquad, placeCard, setSquad } from '../services/squad.js';
 import { track } from '../services/analytics.js';
 import { requireUser } from './auth.js';
+import { playerProfile } from '../services/player-profile.js';
 
 export function cardRoutes(app: FastifyInstance, ctx: AppContext) {
   app.get('/clubs', async () =>
@@ -50,6 +51,12 @@ export function cardRoutes(app: FastifyInstance, ctx: AppContext) {
       .innerJoin(players, eq(players.id, cards.playerId))
       .leftJoin(clubs, eq(clubs.id, players.clubId))
       .where(and(eq(cards.userId, user.id)));
+  });
+
+  app.get('/players/:id', async (req) => {
+    const user = await requireUser(ctx, req);
+    const { id } = z.object({ id: z.string() }).parse(req.params);
+    return playerProfile(ctx.db, id, user.id);
   });
 
   app.get('/squad', async (req) => getSquad(ctx.db, (await requireUser(ctx, req)).id));

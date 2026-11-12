@@ -6,6 +6,7 @@
     "rarity_bands": { "bronze": [40, 59], "silver": [60, 71], "gold": [72, 81], "elite": [82, 99] }
   },
   "squad_rating_cap": 440,
+  "pool": { "min_minutes": 180, "window_gameweeks": 6 },
   "odds": {
     "player": { "bronze": 0.6, "silver": 0.28, "gold": 0.1, "elite": 0.02 },
     "silver": { "silver": 0.85, "gold": 0.13, "elite": 0.02 },

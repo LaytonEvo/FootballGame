@@ -118,6 +118,10 @@ export const packsConfigSchema = z.object({
     rarity_bands: z.record(z.enum(RARITIES), z.tuple([z.number().int(), z.number().int()])),
   }),
   squad_rating_cap: z.number().int().positive(),
+  /** Packs only deal players with at least min_minutes over the last window_gameweeks played gameweeks. */
+  pool: z
+    .object({ min_minutes: z.number().int().min(0), window_gameweeks: z.number().int().positive() })
+    .default({ min_minutes: 180, window_gameweeks: 6 }),
   odds: z.object({
     player: rarityOdds,
     silver: rarityOdds,

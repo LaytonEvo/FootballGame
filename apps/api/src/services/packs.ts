@@ -1,13 +1,22 @@
 import { randomInt } from 'node:crypto';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 import type { PacksConfig, Position, Rarity } from '@ff/shared';
 import { MAX_PLAYERS_PER_CLUB, POSITIONS, RARITIES, STARTER_SHAPE, rarityForRating } from '@ff/shared';
 import { mulberry32, pickOne, randInt } from '@ff/scoring';
 import type { DbOrTx } from '../db/client.js';
-import { cards, clubs, packs, players, squadSlots } from '../db/schema.js';
+import {
+  cards,
+  clubs,
+  fixtures,
+  gameweeks,
+  packs,
+  playerMatchStats,
+  players,
+  squadSlots,
+} from '../db/schema.js';
 import { badRequest, conflict, notFound } from '../errors.js';
 import { newId } from '../ids.js';
-import { getPacksConfig } from './config.js';
+import { getPacksConfig, SEASON } from './config.js';
 import { notify } from './notifications.js';
 
 export type PackType = (typeof packs.$inferSelect)['type'];
@@ -100,6 +109,39 @@ interface PoolPlayer {
   rarity: Rarity;
 }
 
+/**
+ * Minutes per player over the last `window_gameweeks` played gameweeks, and the threshold scaled to however
+ * many have been played so far. Null before any gameweek has been played (pre-season: everyone is eligible).
+ */
+async function recentMinutes(db: DbOrTx, cfg: PacksConfig) {
+  const { min_minutes, window_gameweeks } = cfg.pool;
+  const played = await db
+    .select({ id: gameweeks.id })
+    .from(gameweeks)
+    .where(and(eq(gameweeks.season, SEASON), inArray(gameweeks.status, ['provisional', 'finalised'])))
+    .orderBy(desc(gameweeks.number))
+    .limit(window_gameweeks);
+  if (played.length === 0) return null;
+  const rows = await db
+    .select({
+      playerId: playerMatchStats.playerId,
+      minutes: sql<number>`sum((${playerMatchStats.stats}->>'minutes')::int)::int`,
+    })
+    .from(playerMatchStats)
+    .innerJoin(fixtures, eq(fixtures.id, playerMatchStats.fixtureId))
+    .where(
+      inArray(
+        fixtures.gameweekId,
+        played.map((g) => g.id),
+      ),
+    )
+    .groupBy(playerMatchStats.playerId);
+  return {
+    minutes: new Map(rows.map((r) => [r.playerId, r.minutes])),
+    threshold: Math.ceil((min_minutes * played.length) / window_gameweeks),
+  };
+}
+
 async function pool(db: DbOrTx, cfg: PacksConfig): Promise<PoolPlayer[]> {
   const rows = await db
     .select({
@@ -113,8 +155,11 @@ async function pool(db: DbOrTx, cfg: PacksConfig): Promise<PoolPlayer[]> {
     .from(players)
     .innerJoin(clubs, eq(clubs.id, players.clubId))
     .where(and(eq(players.status, 'active'), eq(clubs.inLeague, true)));
+  // Only players getting game time: fringe and academy players who barely play make useless cards.
+  const recent = await recentMinutes(db, cfg);
+  const playing = recent ? rows.filter((r) => (recent.minutes.get(r.id) ?? 0) >= recent.threshold) : rows;
   // Stable order so a logged seed reproduces the draw.
-  return rows
+  return playing
     .map((r) => ({ ...r, clubId: r.clubId!, rarity: rarityForRating(cfg, r.rating) }))
     .sort((a, b) => a.id.localeCompare(b.id));
 }

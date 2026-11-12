@@ -9,6 +9,7 @@ import { CardFace } from '../../components/CardFace';
 interface OwnedCard {
   card: {
     id: string;
+    playerId: string;
     rarity: 'bronze' | 'silver' | 'gold' | 'elite';
     rating: number;
     level: number;
@@ -50,6 +51,7 @@ export default function Collection() {
           <View key={c.card.id} style={{ opacity: c.card.active ? 1 : 0.5 }}>
             <CardFace
               name={c.player.name}
+              onPress={() => router.push({ pathname: '/player/[id]', params: { id: c.card.playerId } })}
               position={c.player.position}
               clubCode={c.clubCode}
               rarity={c.card.rarity}

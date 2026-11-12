@@ -84,6 +84,16 @@ export default function Squad() {
                   </Small>
                 ) : null}
               </View>
+              {c ? (
+                <Pressable
+                  onPress={() => router.push({ pathname: '/player/[id]', params: { id: c.playerId } })}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${c.name} profile`}
+                  style={{ minHeight: 44, justifyContent: 'center', paddingHorizontal: 6 }}
+                >
+                  <Text style={{ fontFamily: font.bodySemi, color: color.active }}>Profile</Text>
+                </Pressable>
+              ) : null}
               <Small>{slot === s ? 'Choose below' : 'Change'}</Small>
             </Card>
           </Pressable>

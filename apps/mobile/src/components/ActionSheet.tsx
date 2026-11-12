@@ -25,6 +25,7 @@ export function ActionSheet({
   onCaptain,
   onBold,
   onClose,
+  onProfile,
 }: {
   rules: RuleSet;
   slot: PickSlot | null;
@@ -34,6 +35,7 @@ export function ActionSheet({
   onCaptain: () => void;
   onBold: (actionId: string) => void;
   onClose: () => void;
+  onProfile?: () => void;
 }) {
   if (!slot) return null;
   const picked = input.actions[slot.slot] ?? [];
@@ -68,6 +70,20 @@ export function ActionSheet({
             <Text style={{ fontFamily: font.body, fontSize: type.small, color: color.muted }}>
               {slot.position} · {slot.clubCode ?? '—'} · {slot.fixtureLabel}
             </Text>
+            {onProfile ? (
+              <Text
+                onPress={onProfile}
+                accessibilityRole="link"
+                style={{
+                  fontFamily: font.bodySemi,
+                  fontSize: type.small,
+                  color: color.active,
+                  paddingVertical: 4,
+                }}
+              >
+                Player profile ›
+              </Text>
+            ) : null}
           </View>
           <Text style={{ fontFamily: font.bodySemi, color: color.muted }}>
             {picked.length} of {rules.maxActions}

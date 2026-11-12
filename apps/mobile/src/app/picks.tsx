@@ -230,6 +230,11 @@ export default function Picks() {
         }}
         onCaptain={() => setInput(setCaptain(input, open!))}
         onBold={(id) => setInput(toggleBold(input, open!, id))}
+        onProfile={() => {
+          const pid = s.slots.find((x) => x.slot === open)?.playerId;
+          setOpen(null);
+          if (pid) router.push({ pathname: '/player/[id]', params: { id: pid } });
+        }}
         onClose={() => {
           setOpen(null);
           setMsg(null);
