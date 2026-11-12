@@ -9,6 +9,7 @@ import { forbidden, HttpError } from '../errors.js';
 import type { User } from '../services/accounts.js';
 import {
   completeProfile,
+  guestSignIn,
   profileComplete,
   publicUser,
   startSignIn,
@@ -47,6 +48,7 @@ export function authRoutes(app: FastifyInstance, ctx: AppContext) {
       .parse(req.body);
     return verifySignIn(ctx, body.phone, body.code);
   });
+  app.post('/auth/guest', async () => guestSignIn(ctx));
   app.get('/me', async (req) => publicUser(await requireUser(ctx, req, { profile: false })));
   app.post('/me/push-token', async (req) => {
     const user = await requireUser(ctx, req, { profile: false });

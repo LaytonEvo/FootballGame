@@ -21,8 +21,8 @@ passed (the 2025/26 dataset is shifted +364 days, so it plays out live across 20
 
 ## Still to configure
 
-- **SMS is bypassed for testing:** `OTP_BYPASS_CODE` is set on the api, so no texts are sent and the app signs
-  any number straight in. Anyone who types a tester's number gets their account, so **delete
+- **SMS is bypassed for testing:** `OTP_BYPASS_CODE` is set on the api, so sign-up asks for no phone number at all
+  ("Start playing"); the account lives on that device. Anyone who types a tester's number gets their account, so **delete
   `OTP_BYPASS_CODE` before real testers join** and set up Twilio instead.
 - **SMS (later):** set `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_VERIFY_SERVICE_SID` on the api. Without either, sign-in codes appear only in the api deploy logs.
 - **Push:** works from EAS builds of the mobile app (`EXPO_ACCESS_TOKEN` optional). The web preview has no push.

@@ -69,3 +69,17 @@ describe('config seeding', () => {
     expect(meta.json().disclaimer).toMatch(/Not affiliated/);
   });
 });
+
+describe('production sign-in', () => {
+  it('requires a phone number and refuses guest sign-in without the bypass', async () => {
+    const app = await buildApp({
+      db: t.db,
+      clock: t.clock,
+      provider: new CommercialProvider(),
+      otp: new LocalOtpService(t.db, t.clock),
+      push: new MemoryPushSender(),
+    });
+    expect((await app.inject({ method: 'GET', url: '/meta' })).json().phoneSignIn).toBe(true);
+    expect((await app.inject({ method: 'POST', url: '/auth/guest' })).statusCode).toBe(404);
+  });
+});

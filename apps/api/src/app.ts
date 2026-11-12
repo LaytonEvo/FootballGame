@@ -8,6 +8,7 @@ import { authRoutes } from './routes/auth.js';
 import { cardRoutes } from './routes/cards.js';
 import { pickRoutes } from './routes/picks.js';
 import { getEconomy, getScoringConfig } from './services/config.js';
+import { phoneSignInRequired } from './services/accounts.js';
 import './services/live.js';
 import './services/leagues-hooks.js';
 import './services/coins-hooks.js';
@@ -33,7 +34,11 @@ export async function buildApp(ctx: AppContext) {
   });
 
   app.get('/health', async () => ({ ok: true, time: ctx.clock.now().toISOString() }));
-  app.get('/meta', async () => ({ disclaimer: DISCLAIMER, serverTime: ctx.clock.now().toISOString() }));
+  app.get('/meta', async () => ({
+    disclaimer: DISCLAIMER,
+    serverTime: ctx.clock.now().toISOString(),
+    phoneSignIn: phoneSignInRequired(ctx),
+  }));
   app.get('/config/active', async () => {
     const [scoring, economy] = await Promise.all([getScoringConfig(ctx.db), getEconomy(ctx.db)]);
     return { scoring, economy };

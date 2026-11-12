@@ -41,3 +41,23 @@ describe('SMS bypass for testing', () => {
     expect(() => new BypassOtpService('abc')).toThrow();
   });
 });
+
+describe('test builds skip the phone number', () => {
+  it('guest sign-in works only with the bypass on, and leads to the normal profile step', async () => {
+    expect((await app.inject({ method: 'GET', url: '/meta' })).json().phoneSignIn).toBe(false);
+    const g = await app.inject({ method: 'POST', url: '/auth/guest' });
+    expect(g.statusCode).toBe(200);
+    const headers = { authorization: `Bearer ${g.json().token}` };
+    expect((await app.inject({ method: 'GET', url: '/me', headers })).json().profileComplete).toBe(false);
+    const p = await app.inject({
+      method: 'POST',
+      url: '/me/profile',
+      headers,
+      payload: { displayName: 'Guest', ageConfirmed: true, disclaimerAccepted: true },
+    });
+    expect(p.json().starterPackId).toBeTruthy();
+    // a second guest is a separate account
+    const g2 = await app.inject({ method: 'POST', url: '/auth/guest' });
+    expect(g2.json().user.id).not.toBe(g.json().user.id);
+  });
+});

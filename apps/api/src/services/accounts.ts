@@ -109,3 +109,29 @@ export async function completeProfile(ctx: AppContext, user: User, input: Profil
   await track(ctx.db, now, user.id, 'profile_completed', {});
   return { user: publicUser(updated!), starterPackId: pack.id };
 }
+
+/** Phone sign-in is skipped in test builds (OTP_BYPASS_CODE set): the app offers "Start playing" instead. */
+export const phoneSignInRequired = (ctx: AppContext) => !('testCode' in ctx.otp);
+
+/**
+ * Test builds only: create an account with no phone number. The session token is the only way back in,
+ * so a cleared browser or a new device starts a fresh account.
+ */
+export async function guestSignIn(ctx: AppContext) {
+  if (phoneSignInRequired(ctx)) throw new HttpError(404, 'not_found', 'Not available');
+  const now = ctx.clock.now();
+  const [user] = await ctx.db
+    .insert(users)
+    .values({ id: newId(), phoneHash: `guest:${newId()}`, inviteCode: shortCode(8) })
+    .returning();
+  const token = randomBytes(32).toString('base64url');
+  await ctx.db
+    .insert(sessions)
+    .values({
+      tokenHash: sha256(token),
+      userId: user!.id,
+      expiresAt: new Date(now.getTime() + SESSION_TTL_MS),
+    });
+  await track(ctx.db, now, user!.id, 'signup_verified', { isNew: true, guest: true });
+  return { token, user: publicUser(user!), isNew: true };
+}
