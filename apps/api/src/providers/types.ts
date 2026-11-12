@@ -15,6 +15,11 @@ export interface ProviderPlayer {
   rating: number;
   /** First-team regular (ratings are ranked among regulars). */
   regular: boolean;
+  /** Registered at a league club, or gone (sold abroad, loaned out, released). Default active. */
+  status?: 'active' | 'left_league';
+  /** Fitness from the feed: injured / doubtful / suspended, with the feed's news line. */
+  availability?: 'injured' | 'doubtful' | 'suspended' | null;
+  news?: string | null;
 }
 export interface ProviderFixture {
   ref: string;
@@ -42,6 +47,8 @@ export interface ProviderMove {
 /** The single data-feed interface. Dev/replay: FplDatasetProvider. Production: CommercialProvider. */
 export interface DataProvider {
   readonly name: string;
+  /** The squads list is the source of truth for clubs and departures (the sync turns changes into moves). */
+  readonly squadsAreAuthoritative?: boolean;
   clubs(): Promise<ProviderClub[]>;
   squads(): Promise<ProviderPlayer[]>;
   fixtures(): Promise<ProviderFixture[]>;

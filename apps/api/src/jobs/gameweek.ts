@@ -158,10 +158,14 @@ export async function finaliseDueGameweeks(ctx: AppContext): Promise<FinaliseRes
     ).map((f) => f.id);
     const fx = await refreshFixtures(ctx, fxIds);
     if (!fx.every((f) => f.voided || DONE.has(f.status))) continue; // a match is still being played: wait
+    // Wait until the feed has delivered stats for every finished match (the public dataset can lag).
+    const finals = [];
     for (const f of fx) {
       if (f.status === 'finished' && !f.voided)
-        await ingestFixtureStats(ctx, f, await ctx.provider.finalMatchStats(f.providerRef), false);
+        finals.push({ f, stats: await ctx.provider.finalMatchStats(f.providerRef) });
     }
+    if (finals.some((x) => x.stats.length === 0)) continue;
+    for (const { f, stats } of finals) await ingestFixtureStats(ctx, f, stats, false);
     const scored = await scoreGameweek(ctx, gw.id, { provisional: false });
     const [updated] = await ctx.db
       .update(gameweeks)

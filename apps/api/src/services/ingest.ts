@@ -4,6 +4,7 @@ import { cards, clubs, fixtures, gameweeks, players } from '../db/schema.js';
 import { newId } from '../ids.js';
 import { deadlineFor, finalisationTime } from '../time.js';
 import { SEASON } from './config.js';
+import { recordMove } from './moves.js';
 import { positionalRatings } from './ratings.js';
 
 /**
@@ -33,6 +34,7 @@ export async function syncReferenceData(ctx: AppContext, season = SEASON) {
   const existingPlayers = new Map(
     (await db.select({ id: players.id, ref: players.providerRef }).from(players)).map((p) => [p.ref, p.id]),
   );
+  const existingRows = new Map((await db.select().from(players)).map((p) => [p.providerRef, p]));
   const ratings = positionalRatings(
     pPlayers.map((p) => ({ ref: p.ref, position: p.position, quality: p.rating, regular: p.regular })),
   );
@@ -46,9 +48,54 @@ export async function syncReferenceData(ctx: AppContext, season = SEASON) {
       shirtNumber: p.shirtNumber,
       clubId: p.clubRef ? (clubIdByRef.get(p.clubRef) ?? null) : null,
       rating: ratings.get(p.ref) ?? 50,
+      status: p.status ?? ('active' as const),
+      availability: p.availability ?? null,
+      news: p.news ?? null,
     }));
   for (let i = 0; i < newPlayers.length; i += 500)
     await db.insert(players).values(newPlayers.slice(i, i + 500));
+
+  // Existing players: refresh fitness news; where the squads file is authoritative, turn club changes and
+  // departures into moves (applied at the next deadline, with compensation packs where due).
+  const now = ctx.clock.now();
+  for (const p of pPlayers) {
+    const row = existingRows.get(p.ref);
+    if (!row) continue;
+    if (row.availability !== (p.availability ?? null) || row.news !== (p.news ?? null)) {
+      await db
+        .update(players)
+        .set({ availability: p.availability ?? null, news: p.news ?? null })
+        .where(eq(players.id, row.id));
+    }
+    if (!provider.squadsAreAuthoritative) continue;
+    const day = now.toISOString().slice(0, 10);
+    const club = p.clubRef ? (clubIdByRef.get(p.clubRef) ?? null) : null;
+    if (p.status === 'left_league' && row.status === 'active') {
+      await recordMove(db, {
+        ref: `sync:left:${row.id}:${day}`,
+        playerId: row.id,
+        kind: 'left_league',
+        toClubId: null,
+        registeredAt: now,
+      });
+    } else if (p.status !== 'left_league' && row.status !== 'active' && club) {
+      await recordMove(db, {
+        ref: `sync:back:${row.id}:${club}:${day}`,
+        playerId: row.id,
+        kind: 'returned',
+        toClubId: club,
+        registeredAt: now,
+      });
+    } else if (p.status !== 'left_league' && row.status === 'active' && club && club !== row.clubId) {
+      await recordMove(db, {
+        ref: `sync:transfer:${row.id}:${club}`,
+        playerId: row.id,
+        kind: 'transfer',
+        toClubId: club,
+        registeredAt: now,
+      });
+    }
+  }
 
   // Gameweeks from fixture kick-offs.
   const byGw = new Map<number, Date[]>();

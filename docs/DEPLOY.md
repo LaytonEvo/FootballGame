@@ -16,8 +16,12 @@ to the Postgres and Redis services; `PHONE_HASH_SECRET` and `STAFF_TOKENS` were 
 references the api's `PHONE_HASH_SECRET` — never change it once players have signed up, or phone matching
 breaks). Staff console token: api service → Variables → `STAFF_TOKENS` (format `name:token`).
 
-The worker syncs clubs, players and fixtures on every boot and replays any gameweeks whose deadlines have
-passed (the 2025/26 dataset is shifted +364 days, so it plays out live across 2026/27).
+Data: `DATA_PROVIDER=fpl-season` reads the **real 2026/27 season** from the public vaastav dataset on GitHub
+(`providers/fpl-season.ts`, cached 15 minutes): clubs, squads, fixtures, injury news, results and player stats.
+It has no in-play data and is updated by a volunteer, so points arrive only when the files are updated; a
+gameweek finalises at 09:00 the morning after its last match **or later, once its stats exist**. Switch to the
+commercial feed (`DATA_PROVIDER=commercial`) once a provider is chosen. Local development and tests still use
+the 2025/26 replay (default provider).
 
 ## Still to configure
 

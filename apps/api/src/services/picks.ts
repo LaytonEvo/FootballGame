@@ -40,7 +40,8 @@ export async function currentGameweek(db: DbOrTx, season = SEASON): Promise<Game
     .where(eq(gameweeks.season, season))
     .orderBy(asc(gameweeks.number));
   return (
-    rows.find((g) => ['locked', 'live', 'provisional'].includes(g.status)) ??
+    // The most recent gameweek in progress (several can wait for stats when the feed lags).
+    rows.filter((g) => ['locked', 'live', 'provisional'].includes(g.status)).at(-1) ??
     rows.find((g) => g.status === 'upcoming') ??
     rows.at(-1) ??
     null
@@ -155,8 +156,18 @@ function formText(
  * Pre-deadline nudge from recent minutes (the commercial feed will add real injury news): flags a player who
  * has no match, or has barely played in the last two gameweeks. `history` is most recent first.
  */
-export function availabilityWarning(history: PlayerMatchStats[][], hasFixture: boolean): string | null {
+export function availabilityWarning(
+  history: PlayerMatchStats[][],
+  hasFixture: boolean,
+  feed?: { availability: string | null; news: string | null },
+): string | null {
   if (!hasFixture) return 'No match this gameweek';
+  if (feed?.availability) {
+    const label =
+      { injured: 'Injured', doubtful: 'Doubtful', suspended: 'Suspended' }[feed.availability] ??
+      'Unavailable';
+    return feed.news ? `${label}: ${feed.news}` : label;
+  }
   const recent = history.slice(0, 2);
   if (recent.length === 0) return null;
   const mins = recent.flat().reduce((t, m) => t + m.minutes, 0);
@@ -216,7 +227,13 @@ export async function pickScreen(ctx: AppContext, userId: string, gameweekId?: s
   const info = new Map(
     (
       await db
-        .select({ id: players.id, name: players.name, shirtNumber: players.shirtNumber })
+        .select({
+          id: players.id,
+          name: players.name,
+          shirtNumber: players.shirtNumber,
+          availability: players.availability,
+          news: players.news,
+        })
         .from(players)
         .where(
           inArray(
@@ -241,7 +258,7 @@ export async function pickScreen(ctx: AppContext, userId: string, gameweekId?: s
       clubCode: p.clubId ? (codes.get(p.clubId) ?? null) : null,
       fixtures: fx.map((f) => ({ label: f.label, kickoffAt: f.kickoffAt, status: f.status })),
       fixtureLabel: fx.length ? fx.map((f) => f.label).join(', ') : 'No match',
-      warning: availabilityWarning(history, fx.length > 0),
+      warning: availabilityWarning(history, fx.length > 0, info.get(p.playerId)),
       actions: availableActions(rules, p.position).map((a) => ({
         id: a.id,
         label: a.label,

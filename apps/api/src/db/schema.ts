@@ -59,6 +59,9 @@ export const players = pgTable(
       .default('active'),
     /** Card rating 40-99. Drives rarity bands and the squad rating cap. Editable by staff. */
     rating: integer('rating').notNull(),
+    /** Fitness flag from the feed (injured / doubtful / suspended) and its news line. */
+    availability: text('availability'),
+    news: text('news'),
     photoUrl: text('photo_url'), // licensed field, unused
   },
   (t) => [index('players_club').on(t.clubId)],
