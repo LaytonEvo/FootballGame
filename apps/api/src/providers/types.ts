@@ -11,8 +11,10 @@ export interface ProviderPlayer {
   position: Position;
   clubRef: string | null;
   shirtNumber: number | null;
-  /** Provider's quality signal, mapped to a 40-99 card rating by the ingestion job. */
+  /** Provider's quality signal, ranked within position into a 40-99 card rating by the ingestion job. */
   rating: number;
+  /** First-team regular (ratings are ranked among regulars). */
+  regular: boolean;
 }
 export interface ProviderFixture {
   ref: string;

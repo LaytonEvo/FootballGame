@@ -70,6 +70,12 @@ export class FplDatasetProvider implements DataProvider {
     // Club = the club of the player's most recent match on or before "now" (first match if none yet).
     const now = this.opts.clock.now().getTime();
     const latest = new Map<number, DsPlayerMatch>();
+    const seasonMinutes = new Map<number, number>();
+    const seasonPoints = new Map<number, number>();
+    for (const m of this.ds.playerMatches) {
+      seasonMinutes.set(m.playerId, (seasonMinutes.get(m.playerId) ?? 0) + m.stats.minutes);
+      seasonPoints.set(m.playerId, (seasonPoints.get(m.playerId) ?? 0) + m.totalPoints);
+    }
     const first = new Map<number, DsPlayerMatch>();
     for (const m of this.ds.playerMatches) {
       const f = first.get(m.playerId);
@@ -97,7 +103,9 @@ export class FplDatasetProvider implements DataProvider {
           position: f.position,
           clubRef: `fpl:t${cur.teamId}`,
           shirtNumber: null,
-          rating: f.value,
+          // Price first; season points break the many price ties (keepers cluster on two or three prices).
+          rating: f.value + (seasonPoints.get(f.playerId) ?? 0) / 1000,
+          regular: (seasonMinutes.get(f.playerId) ?? 0) >= 900,
         };
       });
   }

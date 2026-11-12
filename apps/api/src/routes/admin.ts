@@ -28,6 +28,7 @@ import { queueCardChanges } from '../services/live-notify.js';
 import { processDueMoves, promoteClub, recordMove, relegateClub } from '../services/moves.js';
 import { hashPhone, normalisePhone } from '../services/phone.js';
 import { scoreGameweek } from '../services/scoring.js';
+import { rerateAllPlayers } from '../services/ingest.js';
 
 /** STAFF_TOKENS="alice:longrandomtoken,bob:othertoken". Every admin call is audited with the staff name. */
 function staffFor(req: FastifyRequest): string {
@@ -154,6 +155,14 @@ export function adminRoutes(app: FastifyInstance, ctx: AppContext) {
       cardsUpdated: updated,
     });
     return { ok: true, cardsUpdated: updated };
+  });
+  /** Re-rate every player within their position (overwrites manual rating edits). */
+  app.post('/admin/players/rerate', async (req) => {
+    const staff = await guard(req);
+    const { cards: alsoCards } = z.object({ cards: z.boolean().default(false) }).parse(req.body ?? {});
+    const res = await rerateAllPlayers(ctx, { cards: alsoCards });
+    await audit(staff, 'player.rerate', { ...res, cards: alsoCards });
+    return res;
   });
   app.put('/admin/cards/:id/rating', async (req) => {
     const staff = await guard(req);

@@ -1,10 +1,10 @@
 import { eq, inArray } from 'drizzle-orm';
 import type { AppContext } from '../context.js';
-import { clubs, fixtures, gameweeks, players } from '../db/schema.js';
+import { cards, clubs, fixtures, gameweeks, players } from '../db/schema.js';
 import { newId } from '../ids.js';
 import { deadlineFor, finalisationTime } from '../time.js';
 import { SEASON } from './config.js';
-import { ratingFromProviderValue } from './ratings.js';
+import { positionalRatings } from './ratings.js';
 
 /**
  * Upsert clubs, players and fixtures from the provider and create/refresh gameweeks.
@@ -33,6 +33,9 @@ export async function syncReferenceData(ctx: AppContext, season = SEASON) {
   const existingPlayers = new Map(
     (await db.select({ id: players.id, ref: players.providerRef }).from(players)).map((p) => [p.ref, p.id]),
   );
+  const ratings = positionalRatings(
+    pPlayers.map((p) => ({ ref: p.ref, position: p.position, quality: p.rating, regular: p.regular })),
+  );
   const newPlayers = pPlayers
     .filter((p) => !existingPlayers.has(p.ref))
     .map((p) => ({
@@ -42,7 +45,7 @@ export async function syncReferenceData(ctx: AppContext, season = SEASON) {
       position: p.position,
       shirtNumber: p.shirtNumber,
       clubId: p.clubRef ? (clubIdByRef.get(p.clubRef) ?? null) : null,
-      rating: ratingFromProviderValue(p.rating),
+      rating: ratings.get(p.ref) ?? 50,
     }));
   for (let i = 0; i < newPlayers.length; i += 500)
     await db.insert(players).values(newPlayers.slice(i, i + 500));
@@ -113,4 +116,27 @@ export async function refreshFixtures(ctx: AppContext, fixtureIds: string[]) {
       .where(eq(fixtures.id, r.id));
   }
   return ctx.db.select().from(fixtures).where(inArray(fixtures.id, fixtureIds));
+}
+
+/**
+ * Re-rate every player from the provider (position-relative ratings). Overwrites staff rating edits, so it is
+ * a deliberate staff action. Existing cards keep their rating and rarity unless `cards` is true.
+ */
+export async function rerateAllPlayers(ctx: AppContext, opts: { cards: boolean }) {
+  const pPlayers = await ctx.provider.squads();
+  const ratings = positionalRatings(
+    pPlayers.map((p) => ({ ref: p.ref, position: p.position, quality: p.rating, regular: p.regular })),
+  );
+  const rows = await ctx.db
+    .select({ id: players.id, ref: players.providerRef, rating: players.rating })
+    .from(players);
+  let changed = 0;
+  for (const r of rows) {
+    const next = ratings.get(r.ref);
+    if (next === undefined || next === r.rating) continue;
+    await ctx.db.update(players).set({ rating: next }).where(eq(players.id, r.id));
+    if (opts.cards) await ctx.db.update(cards).set({ rating: next }).where(eq(cards.playerId, r.id));
+    changed += 1;
+  }
+  return { players: rows.length, changed };
 }
