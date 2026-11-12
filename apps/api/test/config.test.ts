@@ -27,12 +27,13 @@ describe('config seeding', () => {
       'economy:0.1:true',
       'packs:0.1:true',
       'scoring:0.2:true',
+      'scoring:0.3:false',
     ]);
   });
 
   it('is idempotent', async () => {
     await seedConfigs(t.db);
-    expect(await t.db.select().from(configVersions)).toHaveLength(3);
+    expect(await t.db.select().from(configVersions)).toHaveLength(4);
   });
 
   it('switches versions without a release', async () => {

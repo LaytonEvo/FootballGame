@@ -18,8 +18,9 @@ const arg = (k: string, d: string) => {
 const seasons = Number(arg('--seasons', '150'));
 const mode = process.argv[2] ?? 'replay';
 
+const scoringFile = arg('--scoring', 'scoring.v0.3.json');
 const scoringCfg = parseScoringConfig(
-  JSON.parse(readFileSync(new URL('config/scoring.v0.2.json', root), 'utf8')),
+  JSON.parse(readFileSync(new URL(`config/${scoringFile}`, root), 'utf8')),
 );
 const ecoCfg = parseEconomyConfig(
   JSON.parse(readFileSync(new URL('config/economy.v0.1.json', root), 'utf8')),

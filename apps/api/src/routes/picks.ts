@@ -3,7 +3,7 @@ import { z } from 'zod';
 import type { AppContext } from '../context.js';
 import { track } from '../services/analytics.js';
 import { homeScreen } from '../services/home.js';
-import { confirmSelection, currentGameweek, pickScreen, suggest } from '../services/picks.js';
+import { confirmSelection, currentGameweek, pickScreen, suggest, swapWithSub } from '../services/picks.js';
 import { requireUser } from './auth.js';
 
 const selectionInput = z.object({
@@ -25,6 +25,11 @@ export function pickRoutes(app: FastifyInstance, ctx: AppContext) {
     if (!screen.locked)
       await track(ctx.db, ctx.clock.now(), user.id, 'pick_started', { gameweekId: screen.gameweek.id });
     return screen;
+  });
+  app.post('/picks/swap-sub', async (req) => {
+    const user = await requireUser(ctx, req);
+    const { slot } = z.object({ slot: z.number().int().min(0).max(4) }).parse(req.body);
+    return swapWithSub(ctx, user.id, slot);
   });
   app.post('/picks/suggest', async (req) => {
     const user = await requireUser(ctx, req);

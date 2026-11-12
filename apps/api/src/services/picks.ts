@@ -28,6 +28,7 @@ import { getRules, SEASON } from './config.js';
 import { grantPack } from './packs.js';
 import type { StoredSelection } from './selection-body.js';
 import { currentSquadSelection } from './squad-read.js';
+import { setSquad } from './squad.js';
 
 type Gameweek = typeof gameweeks.$inferSelect;
 
@@ -150,6 +151,21 @@ function formText(
   return h.of > 0 ? h.text : null;
 }
 
+/**
+ * Pre-deadline nudge from recent minutes (the commercial feed will add real injury news): flags a player who
+ * has no match, or has barely played in the last two gameweeks. `history` is most recent first.
+ */
+export function availabilityWarning(history: PlayerMatchStats[][], hasFixture: boolean): string | null {
+  if (!hasFixture) return 'No match this gameweek';
+  const recent = history.slice(0, 2);
+  if (recent.length === 0) return null;
+  const mins = recent.flat().reduce((t, m) => t + m.minutes, 0);
+  const span = recent.length === 1 ? 'last gameweek' : 'last 2 gameweeks';
+  if (mins === 0) return `0 mins in ${span}`;
+  if (mins < 45 * recent.length) return `Only ${mins}′ in ${span}`;
+  return null;
+}
+
 export interface SelectionInput {
   /** Actions per squad slot, index 0-4 starters, 5 sub. */
   actions: string[][];
@@ -225,6 +241,7 @@ export async function pickScreen(ctx: AppContext, userId: string, gameweekId?: s
       clubCode: p.clubId ? (codes.get(p.clubId) ?? null) : null,
       fixtures: fx.map((f) => ({ label: f.label, kickoffAt: f.kickoffAt, status: f.status })),
       fixtureLabel: fx.length ? fx.map((f) => f.label).join(', ') : 'No match',
+      warning: availabilityWarning(history, fx.length > 0),
       actions: availableActions(rules, p.position).map((a) => ({
         id: a.id,
         label: a.label,
@@ -328,5 +345,53 @@ export async function confirmSelection(
       potentialPoints: potentialPoints(rules, sel),
       weeklyPack: created ? pack.id : null,
     };
+  });
+}
+
+/**
+ * One-tap "Swap with sub" from the pick screen: the sub moves into the starter's slot (same position only)
+ * and the starter goes to the bench. A confirmed selection for the upcoming gameweek is remapped so each
+ * player keeps their actions; the captaincy stays with the slot. Server-side checks as for any squad change.
+ */
+export async function swapWithSub(ctx: AppContext, userId: string, slot: number) {
+  return ctx.db.transaction(async (tx) => {
+    const squad = await currentSquadSelection(tx, userId);
+    const starter = squad?.starters[slot];
+    if (!squad || !starter) throw badRequest('bad_slot', 'Choose one of your five');
+    if (!squad.sub) throw badRequest('no_sub', 'You have no substitute');
+    if (squad.sub.position !== starter.position) {
+      throw badRequest(
+        'wrong_position',
+        `Your sub is a ${squad.sub.position}; this slot needs a ${starter.position}. Change it in Squad.`,
+      );
+    }
+    const ids = [...squad.starters.map((p) => p.cardId), squad.sub.cardId];
+    [ids[slot], ids[5]] = [ids[5]!, ids[slot]!];
+    await setSquad(tx, userId, ids);
+
+    const gw = await nextUpcomingGameweek(tx);
+    if (gw && gw.status === 'upcoming' && ctx.clock.now() < gw.deadlineAt) {
+      const [saved] = await tx
+        .select()
+        .from(selections)
+        .where(and(eq(selections.userId, userId), eq(selections.gameweekId, gw.id)));
+      if (saved) {
+        const old = saved.body as StoredSelection;
+        const swap = (i: number) => (i === slot ? 5 : i === 5 ? slot : i);
+        const after = (await currentSquadSelection(tx, userId))!;
+        const input = toInput(old);
+        const actions = input.actions.map((_, i) => input.actions[swap(i)] ?? []);
+        const body = applyInput(after, {
+          actions,
+          captain: input.captain,
+          bold: input.bold ? { slot: swap(input.bold.slot), actionId: input.bold.actionId } : null,
+        });
+        await tx
+          .update(selections)
+          .set({ body, updatedAt: ctx.clock.now() })
+          .where(and(eq(selections.userId, userId), eq(selections.gameweekId, gw.id)));
+      }
+    }
+    return { ok: true };
   });
 }

@@ -39,6 +39,10 @@ export const scoringConfigSchema = z.object({
     clean_sheet_min_minutes: z.number().int().min(0),
     double_gameweek: z.string(),
     zero_minutes: z.string(),
+    /** v0.3+: the sub also replaces a starter who played under this many minutes and landed nothing. */
+    sub_cameo_minutes: z.number().int().min(0).optional(),
+    /** v0.3+: when the sub replaces the captain, the captain's ×2 passes to the sub. */
+    captain_passes_to_sub: z.boolean().optional(),
   }),
   tiers: z.record(z.string(), z.string()),
   removed: z.array(z.string()).default([]),

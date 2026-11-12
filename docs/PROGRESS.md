@@ -174,6 +174,21 @@ One short note per phase. Assumptions that need a product decision are collected
 - `docs/ADMIN.md` maps every edge case in the spec to "automatic" or the exact console action.
 - Test: auth required; every action exercised end to end with audit rows.
 
+## After the build — substitute fallbacks (scoring v0.3)
+
+- `config/scoring.v0.3.json` = v0.2 points plus two rules (config switches; v0.2 scores exactly as before):
+  - **Cameo sub:** the sub also replaces a starter who played under 30 minutes (`sub_cameo_minutes`), landed
+    nothing, and was outplayed by the sub. Decided only when both have finished, so it never takes points away;
+    a 0-minute starter takes priority over a cameo.
+  - **Captaincy passes to the sub** (`captain_passes_to_sub`) when the sub replaces the captain.
+- Pick screen nudge: a ⚠ badge on players with no match, 0 minutes or under 45′ a gameweek over the last two,
+  and one-tap **Swap with sub** (same position) in the actions sheet. Actions follow the players; captaincy stays
+  with the slot. Real injury news needs the commercial feed.
+- Season replay with v0.3: about +1 point per gameweek (casual 17.8 → 18.8). Prices unchanged; milestone
+  proposal now 200 / 400 / 600 / 800 (`docs/ECONOMY_CHECK.md`).
+- Player profiles, one-at-a-time pack reveals, and packs only dealing players getting minutes (≥180 over the
+  last 6 played gameweeks, `config/packs` → `pool`).
+
 ## Before the closed test (not code)
 
 - Product decisions: game name, chaos actions at launch, milestone levels (economy check proposes

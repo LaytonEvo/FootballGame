@@ -20,6 +20,7 @@ export function PlayerSpot({
   captain,
   chips,
   bubble,
+  warning,
   onPress,
   onLongPressChip,
   accessibilityHint,
@@ -32,6 +33,7 @@ export function PlayerSpot({
   captain?: boolean;
   chips: SpotChip[];
   bubble?: string;
+  warning?: string | null;
   onPress?: () => void;
   onLongPressChip?: (i: number) => void;
   accessibilityHint?: string;
@@ -40,7 +42,7 @@ export function PlayerSpot({
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`${name}, ${position}, ${fixture}${captain ? ', captain' : ''}. ${chips.map((c) => `${c.label} ${c.value ?? ''} ${c.state ?? ''}`).join(', ')}`}
+      accessibilityLabel={`${name}, ${position}, ${fixture}${captain ? ', captain' : ''}${warning ? `, warning: ${warning}` : ''}. ${chips.map((c) => `${c.label} ${c.value ?? ''} ${c.state ?? ''}`).join(', ')}`}
       accessibilityHint={accessibilityHint}
       style={{ alignItems: 'center', width: 112, gap: 3 }}
     >
@@ -116,6 +118,23 @@ export function PlayerSpot({
           {fixture}
         </Text>
       </View>
+      {warning ? (
+        <Text
+          numberOfLines={2}
+          style={{
+            alignSelf: 'stretch',
+            textAlign: 'center',
+            backgroundColor: color.missed.bg,
+            color: color.missed.text,
+            borderRadius: 6,
+            paddingHorizontal: 4,
+            fontFamily: font.bodyBold,
+            fontSize: 10,
+          }}
+        >
+          ⚠ {warning}
+        </Text>
+      ) : null}
       <View style={{ gap: 3, alignSelf: 'stretch' }}>
         {chips.map((c, i) => {
           const empty = c.state === 'empty';

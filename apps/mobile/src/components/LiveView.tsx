@@ -29,7 +29,7 @@ export function LiveView({ home }: { home: HomeData }) {
         rarity={s.rarity}
         fixture={s.matchLabel}
         captain={s.captain}
-        bubble={s.role === 'out' ? '0' : String(s.points)}
+        bubble={s.role === 'out' || s.role === 'subbed_off' ? '0' : String(s.points)}
         chips={s.lines.map((l) => ({
           label: SHORT_LABEL[l.actionId] ?? l.label,
           value:

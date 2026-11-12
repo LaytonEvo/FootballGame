@@ -134,6 +134,8 @@ export async function getPacksConfig(db: DbOrTx, season = SEASON): Promise<Packs
 
 export async function seedConfigs(db: DbOrTx) {
   await upsertConfigVersion(db, 'scoring', readConfigFile('scoring.v0.2.json'));
+  // v0.3 adds the substitute fallbacks. Loaded but not auto-activated: staff switch versions in the console.
+  await upsertConfigVersion(db, 'scoring', readConfigFile('scoring.v0.3.json'));
   await upsertConfigVersion(db, 'economy', readConfigFile('economy.v0.1.json'));
   await upsertConfigVersion(db, 'packs', readConfigFile('packs.v0.1.json'));
 }

@@ -20,6 +20,8 @@ export interface PickSlot {
   rarity: Rarity;
   clubCode: string | null;
   fixtureLabel: string;
+  /** Pre-deadline nudge, e.g. "0 mins in last 2 gameweeks". */
+  warning: string | null;
   fixtures: { label: string; kickoffAt: string | null; status: string }[];
   actions: PickAction[];
 }

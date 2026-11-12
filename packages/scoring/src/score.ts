@@ -7,7 +7,7 @@ import type { Selection, SlotPick } from './selection.js';
 import { SUB_SLOT } from './selection.js';
 
 export type ActionState = 'pending' | 'landed' | 'missed' | 'void';
-export type SlotRole = 'starter' | 'out' | 'sub_in' | 'sub_bench' | 'sub_pending';
+export type SlotRole = 'starter' | 'out' | 'subbed_off' | 'sub_in' | 'sub_bench' | 'sub_pending';
 
 export interface ScoreLine {
   actionId: string;
@@ -23,7 +23,7 @@ export interface ScoreLine {
   /** Points if it lands (for pending lines and the potential-points footer). */
   potential: number;
   explanation: string;
-  voidReason?: 'no_minutes' | 'match_void' | 'stat_unavailable' | 'sub_not_used';
+  voidReason?: 'no_minutes' | 'match_void' | 'stat_unavailable' | 'sub_not_used' | 'cameo_replaced';
 }
 
 export interface SlotScore {
@@ -96,6 +96,7 @@ function scoreSlot(
         g.voided ? 'match postponed or abandoned' : 'did not play',
       );
     if (opts.role === 'sub_bench') return voidLine('sub_not_used', 'substitute not needed');
+    if (opts.role === 'subbed_off') return voidLine('cameo_replaced', 'barely played, substitute came in');
     if (g.voided) return voidLine('match_void', 'match postponed or abandoned');
 
     const count = resolver.count(g, pick.position);
@@ -143,28 +144,60 @@ function scoreSlot(
  *
  * Rules (config/scoring.v0.2.json): base × rarity × bold (if landed) × captain, rounded per line.
  * Missed bold costs ceil(base × penalty fraction), not multiplied by rarity or captain.
- * The substitute comes in when any starter is out (0 minutes, blank, or match void). Captaincy does not
- * transfer to the sub; the sub scores its own pre-set actions at its own rarity. A bold action on an
- * out starter is voided.
+ * The substitute comes in when any starter is out (0 minutes, blank, or match void) and, from v0.3, when a
+ * starter played under `sub_cameo_minutes`, landed nothing and was outplayed by the sub. The sub scores its own
+ * pre-set actions at its own rarity; from v0.3 it also takes the captain's ×2 if it replaced the captain. A
+ * bold action on a replaced starter is voided.
  */
 export function scoreSquad(rules: RuleSet, sel: Selection, stats: StatsByPlayer): SquadScore {
   const agg = (id: string) => aggregate(stats.get(id) ?? [], rules.cleanSheetMinMinutes);
   const starterStats = sel.starters.map((p) => agg(p.playerId));
-  const anyOut = starterStats.some(isOut);
-  const allDecided = starterStats.every((g) => g.finished);
+  const subStats = sel.sub ? agg(sel.sub.playerId) : null;
+
+  // Which starter (if any) the substitute replaces. One sub only.
+  const outIdx = starterStats.flatMap((g, i) => (isOut(g) ? [i] : []));
+  const landedAny = (i: number) =>
+    sel.starters[i]!.actions.some(
+      (id) => (RESOLVERS[id]?.count(starterStats[i]!, sel.starters[i]!.position) ?? 0) > 0,
+    );
+  // Cameo rule (rules.subCameoMinutes > 0): a starter who played under the threshold, landed nothing, and was
+  // outplayed by the sub is replaced. Decided only once both have finished, so it never takes points away.
+  const cameoCandidate = (i: number) => {
+    const g = starterStats[i]!;
+    return (
+      rules.subCameoMinutes > 0 &&
+      g.finished &&
+      g.minutes > 0 &&
+      g.minutes < rules.subCameoMinutes &&
+      !landedAny(i)
+    );
+  };
+  const cameoIdx = subStats?.finished
+    ? starterStats.flatMap((g, i) => (cameoCandidate(i) && subStats.minutes > g.minutes ? [i] : []))
+    : [];
+  const prefer = (idx: number[]) =>
+    idx.length === 0
+      ? null
+      : rules.captainToSub && sel.captain !== null && idx.includes(sel.captain)
+        ? sel.captain
+        : idx[0]!;
+  const replaced = sel.sub ? (prefer(outIdx) ?? prefer(cameoIdx)) : null;
+  const cameoPending = !!sel.sub && !subStats?.finished && starterStats.some((_, i) => cameoCandidate(i));
+  const allDecided = starterStats.every((g) => g.finished) && !cameoPending;
 
   const slots: SlotScore[] = sel.starters.map((pick, i) =>
     scoreSlot(rules, i, pick, starterStats[i]!, {
       captain: sel.captain === i,
       boldActionId: sel.bold?.slot === i ? sel.bold.actionId : null,
-      role: isOut(starterStats[i]!) ? 'out' : 'starter',
+      role: isOut(starterStats[i]!) ? 'out' : replaced === i ? 'subbed_off' : 'starter',
     }),
   );
   if (sel.sub) {
-    const role: SlotRole = anyOut ? 'sub_in' : allDecided ? 'sub_bench' : 'sub_pending';
+    const role: SlotRole = replaced !== null ? 'sub_in' : allDecided ? 'sub_bench' : 'sub_pending';
     slots.push(
-      scoreSlot(rules, SUB_SLOT, sel.sub, agg(sel.sub.playerId), {
-        captain: false,
+      scoreSlot(rules, SUB_SLOT, sel.sub, subStats!, {
+        // Captaincy follows the slot when the sub replaces the captain (rules.captainToSub).
+        captain: rules.captainToSub && replaced !== null && replaced === sel.captain,
         boldActionId: sel.bold?.slot === SUB_SLOT ? sel.bold.actionId : null,
         role,
       }),

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { potentialPoints, scoreSquad } from '../src/index.js';
-import { baseSelection, match, pick, quietWeek, rules, statsMap } from './helpers.js';
+import { compileRules, potentialPoints, scoreSquad } from '../src/index.js';
+import { parseScoringConfig } from '@ff/shared';
+import { baseSelection, match, pick, quietWeek, rawConfig, rules, statsMap } from './helpers.js';
 
 const withStats = (...over: ReturnType<typeof match>[]) => {
   const ids = new Set(over.map((m) => m.playerId));
@@ -335,5 +336,95 @@ describe('determinism and potential', () => {
 
   it('potential points sums landed value of every starter action', () => {
     expect(potentialPoints(rules, baseSelection({ captain: 4 }))).toBe(3 + 8 + 3 + 8 + 10);
+  });
+});
+
+describe('v0.3 substitute fallbacks', () => {
+  const v3 = compileRules(
+    parseScoringConfig({
+      ...rawConfig,
+      version: '0.3',
+      rules: { ...rawConfig.rules, sub_cameo_minutes: 30, captain_passes_to_sub: true },
+    }),
+  );
+  const cameo = (over: Partial<Parameters<typeof match>[1]> = {}) =>
+    withStats(match('fwd', { minutes: 12, ...over }), match('sub', { assists: 1 }));
+
+  it('v0.2 rules are unchanged: a cameo starter stays in', () => {
+    const s = scoreSquad(rules, baseSelection(), cameo());
+    expect(s.slots[4]!.role).toBe('starter');
+    expect(s.slots[5]!.role).toBe('sub_bench');
+  });
+  it('sub replaces a starter who played under 30 minutes and landed nothing', () => {
+    const s = scoreSquad(v3, baseSelection(), cameo());
+    expect(s.slots[4]!.role).toBe('subbed_off');
+    expect(s.slots[4]!.lines[0]!.voidReason).toBe('cameo_replaced');
+    expect(s.slots[5]!.role).toBe('sub_in');
+    expect(s.total).toBe(15);
+  });
+  it('a cameo scorer keeps their points', () => {
+    const s = scoreSquad(v3, baseSelection(), cameo({ goals: 1 }));
+    expect(s.slots[4]!.role).toBe('starter');
+    expect(s.total).toBe(5);
+  });
+  it('no swap if the sub played fewer minutes, or the starter played 30+', () => {
+    expect(
+      scoreSquad(
+        v3,
+        baseSelection(),
+        withStats(match('fwd', { minutes: 12 }), match('sub', { minutes: 10, assists: 1 })),
+      ).slots[5]!.role,
+    ).toBe('sub_bench');
+    expect(scoreSquad(v3, baseSelection(), cameo({ minutes: 30 })).slots[5]!.role).toBe('sub_bench');
+  });
+  it('waits for the sub to finish before deciding', () => {
+    const s = scoreSquad(
+      v3,
+      baseSelection(),
+      withStats(match('fwd', { minutes: 12 }), match('sub', { status: 'live', minutes: 40 })),
+    );
+    expect(s.slots[4]!.role).toBe('starter');
+    expect(s.slots[5]!.role).toBe('sub_pending');
+    expect(s.provisional).toBe(true);
+  });
+  it('an out starter takes priority over a cameo; a missed bold on a cameo starter is voided', () => {
+    const sel = baseSelection({ bold: { slot: 4, actionId: 'goal' } });
+    const s = scoreSquad(
+      v3,
+      sel,
+      withStats(match('fwd', { minutes: 12 }), match('def', { minutes: 0 }), match('sub', { assists: 1 })),
+    );
+    expect(s.slots[1]!.role).toBe('out');
+    expect(s.slots[4]!.role).toBe('starter');
+    expect(s.slots[4]!.lines[0]!.points).toBe(-3); // still a starter: bold missed
+    const only = scoreSquad(v3, sel, cameo());
+    expect(only.slots[4]!.lines[0]!.state).toBe('void');
+    expect(only.total).toBe(15);
+  });
+  it('captaincy passes to the sub when the sub replaces the captain', () => {
+    const out = scoreSquad(
+      v3,
+      baseSelection({ captain: 4 }),
+      withStats(match('fwd', { minutes: 0 }), match('sub', { assists: 1 })),
+    );
+    expect(out.slots[5]!.lines[0]!.captain).toBe(true);
+    expect(out.total).toBe(30);
+    const viaCameo = scoreSquad(v3, baseSelection({ captain: 4 }), cameo());
+    expect(viaCameo.total).toBe(30);
+    // two starters out: the sub goes to the captain's slot
+    const two = scoreSquad(
+      v3,
+      baseSelection({ captain: 4 }),
+      withStats(match('def', { minutes: 0 }), match('fwd', { minutes: 0 }), match('sub', { assists: 1 })),
+    );
+    expect(two.total).toBe(30);
+    // v0.2: no transfer
+    expect(
+      scoreSquad(
+        rules,
+        baseSelection({ captain: 4 }),
+        withStats(match('fwd', { minutes: 0 }), match('sub', { assists: 1 })),
+      ).total,
+    ).toBe(15);
   });
 });

@@ -26,6 +26,7 @@ export function ActionSheet({
   onBold,
   onClose,
   onProfile,
+  swap,
 }: {
   rules: RuleSet;
   slot: PickSlot | null;
@@ -36,6 +37,8 @@ export function ActionSheet({
   onBold: (actionId: string) => void;
   onClose: () => void;
   onProfile?: () => void;
+  /** Same-position sub available: offer one-tap swap. String = why it isn't possible. */
+  swap?: { subName: string; onSwap: () => void } | string | null;
 }) {
   if (!slot) return null;
   const picked = input.actions[slot.slot] ?? [];
@@ -70,6 +73,11 @@ export function ActionSheet({
             <Text style={{ fontFamily: font.body, fontSize: type.small, color: color.muted }}>
               {slot.position} · {slot.clubCode ?? '—'} · {slot.fixtureLabel}
             </Text>
+            {slot.warning ? (
+              <Text style={{ fontFamily: font.bodyBold, fontSize: type.small, color: color.missed.text }}>
+                ⚠ {slot.warning}
+              </Text>
+            ) : null}
             {onProfile ? (
               <Text
                 onPress={onProfile}
@@ -206,6 +214,19 @@ export function ActionSheet({
             </Pressable>
           );
         })}
+        {slot.slot < 5 && swap ? (
+          typeof swap === 'string' ? (
+            slot.warning ? (
+              <Text style={{ fontFamily: font.body, fontSize: type.small, color: color.muted }}>{swap}</Text>
+            ) : null
+          ) : (
+            <Button
+              title={`Swap with sub (${swap.subName})`}
+              variant={slot.warning ? 'primary' : 'secondary'}
+              onPress={swap.onSwap}
+            />
+          )
+        ) : null}
         <Button title="Done" onPress={onClose} />
       </View>
     </Modal>

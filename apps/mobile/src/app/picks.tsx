@@ -7,7 +7,7 @@ import { useApi } from '../lib/useApi';
 import { useRules } from '../lib/rules';
 import type { PickScreen, SelectionInput } from '../lib/types';
 import { SHORT_LABEL, shirtLabel } from '../lib/types';
-import { shortDateTime } from '../lib/format';
+import { plateName, shortDateTime } from '../lib/format';
 import { color, font, type } from '../lib/theme';
 import type { SlotMeta } from '../features/picks/state';
 import { setCaptain, summary, toggleAction, toggleBold } from '../features/picks/state';
@@ -74,6 +74,22 @@ export default function Picks() {
       setErr((e as Error).message);
     }
   };
+  /** Sub moves into the slot; actions follow the players, captaincy stays with the slot. */
+  const swapSub = async (slot: number) => {
+    try {
+      await api('/picks/swap-sub', { body: { slot } });
+      const sw = (i: number) => (i === slot ? 5 : i === 5 ? slot : i);
+      setInput({
+        actions: input.actions.map((_, i) => input.actions[sw(i)] ?? []),
+        captain: input.captain,
+        bold: input.bold ? { slot: sw(input.bold.slot), actionId: input.bold.actionId } : null,
+      });
+      setOpen(null);
+      await screen.reload();
+    } catch (e) {
+      setErr((e as Error).message);
+    }
+  };
   const confirm = async () => {
     setBusy(true);
     setErr(null);
@@ -99,6 +115,7 @@ export default function Picks() {
         rarity={p.rarity}
         fixture={p.fixtureLabel}
         captain={input.captain === slot}
+        warning={p.warning}
         chips={chipsFor(slot)}
         onPress={locked ? undefined : () => setOpen(slot)}
         onLongPressChip={
@@ -230,6 +247,15 @@ export default function Picks() {
         }}
         onCaptain={() => setInput(setCaptain(input, open!))}
         onBold={(id) => setInput(toggleBold(input, open!, id))}
+        swap={(() => {
+          const st = open === null ? null : s.slots.find((x) => x.slot === open);
+          const sb = s.slots.find((x) => x.slot === 5);
+          if (!st || open === 5) return null;
+          if (!sb) return 'No sub yet. Your weekly free pack can fill the bench.';
+          if (sb.position !== st.position)
+            return `Your sub is a ${sb.position}. Change it in Squad to cover this ${st.position}.`;
+          return { subName: plateName(sb.name), onSwap: () => swapSub(open!) };
+        })()}
         onProfile={() => {
           const pid = s.slots.find((x) => x.slot === open)?.playerId;
           setOpen(null);

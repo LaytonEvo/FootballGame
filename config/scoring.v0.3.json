@@ -1,0 +1,369 @@
+{
+  "version": "0.3",
+  "season": "2026-27-test",
+  "status": "v0.2 points table plus the substitute fallbacks: cameo sub and captaincy passing to the sub",
+  "rules": {
+    "actions_per_starter": {
+      "min": 1,
+      "max": 2
+    },
+    "no_two_actions_from_same_overlap_group": true,
+    "captain_multiplier": 2,
+    "bold_action": {
+      "per_gameweek": 1,
+      "multiplier_if_landed": 2,
+      "penalty_if_missed": "-50% of base points, rounded up"
+    },
+    "max_chaos_actions_per_squad": 1,
+    "rarity_multiplier": {
+      "bronze": 1.2,
+      "silver": 1.1,
+      "gold": 1.0,
+      "elite": 0.9
+    },
+    "order_of_operations": "base points x rarity multiplier x bold (if landed) x captain; round to nearest integer at the end",
+    "points_fixed_for_season": true,
+    "deadline": "90 minutes before first kick-off of the gameweek; server-enforced",
+    "finalisation": "09:00 Europe/London the morning after the last match of the gameweek; no changes after",
+    "clean_sheet_min_minutes": 60,
+    "double_gameweek": "resolve on combined stats across both matches",
+    "zero_minutes": "substitute comes in with their own pre-set actions",
+    "sub_cameo_minutes": 30,
+    "captain_passes_to_sub": true
+  },
+  "tiers": {
+    "likely": "hit rate >= 40%",
+    "possible": "20-40%",
+    "bold": "8-20%",
+    "long_shot": "< 8%",
+    "chaos": "discipline actions, max one per squad"
+  },
+  "removed": ["red_card", "own_goal", "penalty_missed (under 1% of matches; main spot-fixing markets)"],
+  "parked": [
+    "off_bench_and_scores (sub slot only; reprice later)",
+    "shots_on_target, chances_created, dribbles, interceptions, penalties scored/won/conceded, headed and outside-box goals (advanced feed; untested)"
+  ],
+  "mvp_basic_feed_only": true,
+  "actions": [
+    {
+      "id": "goal",
+      "label": "Scores a goal (per goal)",
+      "overlap_group": "goal",
+      "chaos": false,
+      "data_feed": "basic",
+      "resolution": "per_occurrence",
+      "positions": {
+        "DEF": {
+          "points": 25,
+          "hit_rate_2025_26": 0.0352,
+          "tier": "long_shot"
+        },
+        "MID": {
+          "points": 10,
+          "hit_rate_2025_26": 0.112,
+          "tier": "bold"
+        },
+        "FWD": {
+          "points": 5,
+          "hit_rate_2025_26": 0.2561,
+          "tier": "possible"
+        }
+      }
+    },
+    {
+      "id": "goals_2plus",
+      "label": "Scores 2+ goals",
+      "overlap_group": "goal",
+      "chaos": false,
+      "data_feed": "basic",
+      "resolution": "threshold",
+      "positions": {
+        "FWD": {
+          "points": 20,
+          "hit_rate_2025_26": 0.0484,
+          "tier": "long_shot"
+        }
+      }
+    },
+    {
+      "id": "hat_trick",
+      "label": "Hat-trick",
+      "overlap_group": "goal",
+      "chaos": false,
+      "data_feed": "basic",
+      "resolution": "threshold",
+      "positions": {
+        "FWD": {
+          "points": 60,
+          "hit_rate_2025_26": 0.0052,
+          "tier": "long_shot"
+        }
+      }
+    },
+    {
+      "id": "assist",
+      "label": "Assist",
+      "overlap_group": "assist",
+      "chaos": false,
+      "data_feed": "basic",
+      "resolution": "threshold",
+      "positions": {
+        "DEF": {
+          "points": 15,
+          "hit_rate_2025_26": 0.0642,
+          "tier": "long_shot"
+        },
+        "MID": {
+          "points": 15,
+          "hit_rate_2025_26": 0.1137,
+          "tier": "bold"
+        },
+        "FWD": {
+          "points": 20,
+          "hit_rate_2025_26": 0.083,
+          "tier": "bold"
+        }
+      }
+    },
+    {
+      "id": "goal_involvement",
+      "label": "Goal involvement (goal or assist)",
+      "overlap_group": "goal",
+      "chaos": false,
+      "data_feed": "basic",
+      "resolution": "threshold",
+      "positions": {
+        "DEF": {
+          "points": 15,
+          "hit_rate_2025_26": 0.0973,
+          "tier": "bold"
+        },
+        "MID": {
+          "points": 8,
+          "hit_rate_2025_26": 0.2076,
+          "tier": "possible"
+        },
+        "FWD": {
+          "points": 5,
+          "hit_rate_2025_26": 0.3149,
+          "tier": "possible"
+        }
+      }
+    },
+    {
+      "id": "clean_sheet",
+      "label": "Clean sheet (60+ mins on pitch)",
+      "overlap_group": "clean_sheet",
+      "chaos": false,
+      "data_feed": "basic",
+      "resolution": "threshold",
+      "positions": {
+        "GK": {
+          "points": 7,
+          "hit_rate_2025_26": 0.2302,
+          "tier": "possible"
+        },
+        "DEF": {
+          "points": 8,
+          "hit_rate_2025_26": 0.2094,
+          "tier": "possible"
+        },
+        "MID": {
+          "points": 7,
+          "hit_rate_2025_26": 0.2173,
+          "tier": "possible"
+        }
+      }
+    },
+    {
+      "id": "saves_3plus",
+      "label": "3+ saves",
+      "overlap_group": "saves",
+      "chaos": false,
+      "data_feed": "basic",
+      "resolution": "threshold",
+      "positions": {
+        "GK": {
+          "points": 3,
+          "hit_rate_2025_26": 0.4817,
+          "tier": "likely"
+        }
+      }
+    },
+    {
+      "id": "saves_5plus",
+      "label": "5+ saves",
+      "overlap_group": "saves",
+      "chaos": false,
+      "data_feed": "basic",
+      "resolution": "threshold",
+      "positions": {
+        "GK": {
+          "points": 10,
+          "hit_rate_2025_26": 0.1494,
+          "tier": "bold"
+        }
+      }
+    },
+    {
+      "id": "penalty_save",
+      "label": "Penalty save",
+      "overlap_group": "pen_save",
+      "chaos": false,
+      "data_feed": "basic",
+      "resolution": "threshold",
+      "positions": {
+        "GK": {
+          "points": 40,
+          "hit_rate_2025_26": 0.0137,
+          "tier": "long_shot"
+        }
+      }
+    },
+    {
+      "id": "tackles_3plus",
+      "label": "3+ tackles",
+      "overlap_group": "tackles",
+      "chaos": false,
+      "data_feed": "advanced",
+      "resolution": "threshold",
+      "positions": {
+        "DEF": {
+          "points": 8,
+          "hit_rate_2025_26": 0.1912,
+          "tier": "bold"
+        },
+        "MID": {
+          "points": 8,
+          "hit_rate_2025_26": 0.2064,
+          "tier": "possible"
+        },
+        "FWD": {
+          "points": 25,
+          "hit_rate_2025_26": 0.0433,
+          "tier": "long_shot"
+        }
+      }
+    },
+    {
+      "id": "cbi_5plus",
+      "label": "5+ clearances, blocks, interceptions",
+      "overlap_group": "cbi",
+      "chaos": false,
+      "data_feed": "advanced",
+      "resolution": "threshold",
+      "positions": {
+        "DEF": {
+          "points": 3,
+          "hit_rate_2025_26": 0.4938,
+          "tier": "likely"
+        },
+        "MID": {
+          "points": 15,
+          "hit_rate_2025_26": 0.1048,
+          "tier": "bold"
+        }
+      }
+    },
+    {
+      "id": "def_contribution",
+      "label": "Defensive contribution target (FPL definition: DEF 10 CBIT, MID 12 CBIRT)",
+      "overlap_group": "def_contribution",
+      "chaos": false,
+      "data_feed": "advanced",
+      "resolution": "threshold",
+      "positions": {
+        "DEF": {
+          "points": 7,
+          "hit_rate_2025_26": 0.2351,
+          "tier": "possible"
+        },
+        "MID": {
+          "points": 9,
+          "hit_rate_2025_26": 0.1594,
+          "tier": "bold"
+        }
+      }
+    },
+    {
+      "id": "plays_90",
+      "label": "Plays the full 90 minutes",
+      "overlap_group": "minutes",
+      "chaos": false,
+      "data_feed": "basic",
+      "resolution": "threshold",
+      "positions": {
+        "GK": {
+          "points": 2,
+          "hit_rate_2025_26": 0.8948,
+          "tier": "likely"
+        },
+        "DEF": {
+          "points": 2,
+          "hit_rate_2025_26": 0.7016,
+          "tier": "likely"
+        },
+        "MID": {
+          "points": 3,
+          "hit_rate_2025_26": 0.4992,
+          "tier": "likely"
+        },
+        "FWD": {
+          "points": 4,
+          "hit_rate_2025_26": 0.4014,
+          "tier": "likely"
+        }
+      }
+    },
+    {
+      "id": "yellow_card",
+      "label": "Yellow card",
+      "overlap_group": "discipline",
+      "chaos": true,
+      "data_feed": "basic",
+      "resolution": "threshold",
+      "positions": {
+        "GK": {
+          "points": 9,
+          "hit_rate_2025_26": 0.064,
+          "tier": "chaos"
+        },
+        "DEF": {
+          "points": 4,
+          "hit_rate_2025_26": 0.1474,
+          "tier": "chaos"
+        },
+        "MID": {
+          "points": 4,
+          "hit_rate_2025_26": 0.1414,
+          "tier": "chaos"
+        },
+        "FWD": {
+          "points": 6,
+          "hit_rate_2025_26": 0.0934,
+          "tier": "chaos"
+        }
+      }
+    },
+    {
+      "id": "scores_and_booked",
+      "label": "Scores and gets booked",
+      "overlap_group": "goal",
+      "chaos": true,
+      "data_feed": "basic",
+      "resolution": "threshold",
+      "positions": {
+        "MID": {
+          "points": 40,
+          "hit_rate_2025_26": 0.0149,
+          "tier": "chaos"
+        },
+        "FWD": {
+          "points": 10,
+          "hit_rate_2025_26": 0.0502,
+          "tier": "chaos"
+        }
+      }
+    }
+  ]
+}
