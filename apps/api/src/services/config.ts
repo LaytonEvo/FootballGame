@@ -139,5 +139,7 @@ export async function seedConfigs(db: DbOrTx) {
   await upsertConfigVersion(db, 'economy', readConfigFile('economy.v0.1.json'));
   // v0.2 adds earned limited editions and card-for-card trading (activate from the staff console).
   await upsertConfigVersion(db, 'economy', readConfigFile('economy.v0.2.json'));
+  // v0.3 is v0.2 with trading open to brand-new accounts, for the closed test only.
+  await upsertConfigVersion(db, 'economy', readConfigFile('economy.v0.3.json'));
   await upsertConfigVersion(db, 'packs', readConfigFile('packs.v0.1.json'));
 }

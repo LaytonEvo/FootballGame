@@ -1,0 +1,62 @@
+{
+  "version": "0.3",
+  "status": "v0.2 with the trading account-age minimum set to 0 days for the closed test (restore 7 before wider release)",
+  "currencies": {
+    "season_points": "league score, never spent, resets each August",
+    "coins": "earned 1 per point scored; spent on packs and swaps; never affects ranking"
+  },
+  "prices_coins": {
+    "player_pack": 100,
+    "card_swap": 60,
+    "squad_pack": 400
+  },
+  "free_rewards": {
+    "starter_pack": "once on sign-up: 5 players in squad shape, same tier, one guaranteed stronger card",
+    "weekly_free_pack": "one player pack per gameweek, unlocked by confirming that week's actions"
+  },
+  "season_milestones": [
+    {
+      "season_points": 250,
+      "reward": "silver_pack"
+    },
+    {
+      "season_points": 500,
+      "reward": "gold_pack"
+    },
+    {
+      "season_points": 750,
+      "reward": "gold_pack"
+    },
+    {
+      "season_points": 1000,
+      "reward": "elite_pack"
+    }
+  ],
+  "compensation": {
+    "player_leaves_pl": "free swap pack of same rarity",
+    "club_relegated": "free swap pack per card, same rarity",
+    "retired": "free swap pack of same rarity"
+  },
+  "pack_odds": "to be set; must be logged per opening and visible on the pack",
+  "never": [
+    "cash out",
+    "real-money trading of cards",
+    "real-money prizes on paid entry",
+    "paid purchases of any kind in the MVP test"
+  ],
+  "editions": {
+    "team_of_the_week": {
+      "comment": "After each gameweek is final: the best GK, DEF, two MIDs and FWD become a numbered edition. The top award_top_percent of that week's players each get a Team of the Week pack. Earned only: never sold.",
+      "supply_per_player": 50,
+      "award_top_percent": 10
+    }
+  },
+  "trading": {
+    "comment": "Card-for-card only, between players who share a mini-league. No Coins, money or gifting.",
+    "enabled": true,
+    "same_league_required": true,
+    "min_account_age_days": 0,
+    "max_trades_per_week": 5,
+    "offer_expiry_hours": 48
+  }
+}

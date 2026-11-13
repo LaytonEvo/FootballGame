@@ -230,3 +230,5 @@ One short note per phase. Assumptions that need a product decision are collected
 | A7  | Chaos cap scope                          | "Max one per squad" counts the sub's actions too                                                                              | `validateSelection` |
 | A8  | Overlap                                  | Follows config groups exactly: `assist` + `goal_involvement` is allowed (different groups)                                    | config              |
 | A9  | Negative weeks                           | Season Points can go negative (bold misses); Coins earned are floored at 0 per week                                           | ledger              |
+
+**Economy v0.3 (closed test).** Same as v0.2 but `trading.min_account_age_days` is 0 so new testers can trade straight away. Active on live. Switch back to v0.2 (7 days) before any wider release.
