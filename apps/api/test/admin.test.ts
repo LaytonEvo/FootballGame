@@ -167,7 +167,7 @@ describe('admin console API', () => {
     };
     const next = {
       ...eco,
-      version: '0.2',
+      version: '0.9-test',
       season_milestones: [200, 400, 550, 750].map((p, i) => ({
         season_points: p,
         reward: eco.season_milestones[i]!['reward' as never],
@@ -187,7 +187,7 @@ describe('admin console API', () => {
       method: 'POST',
       url: '/admin/config/activate',
       headers: staff,
-      payload: { kind: 'economy', version: '0.2' },
+      payload: { kind: 'economy', version: '0.9-test' },
     });
     const rewards = (await app.inject({ method: 'GET', url: '/rewards', headers: u.headers })).json();
     expect(rewards.milestones[0].season_points).toBe(200);

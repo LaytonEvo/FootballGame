@@ -25,6 +25,7 @@ describe('config seeding', () => {
     const rows = await t.db.select().from(configVersions);
     expect(rows.map((r) => `${r.kind}:${r.version}:${r.active}`).sort()).toEqual([
       'economy:0.1:true',
+      'economy:0.2:false',
       'packs:0.1:true',
       'scoring:0.2:true',
       'scoring:0.3:false',
@@ -33,7 +34,7 @@ describe('config seeding', () => {
 
   it('is idempotent', async () => {
     await seedConfigs(t.db);
-    expect(await t.db.select().from(configVersions)).toHaveLength(4);
+    expect(await t.db.select().from(configVersions)).toHaveLength(5);
   });
 
   it('switches versions without a release', async () => {

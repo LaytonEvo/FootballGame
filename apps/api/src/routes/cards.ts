@@ -2,7 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import { and, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import type { AppContext } from '../context.js';
-import { cards, clubs, players } from '../db/schema.js';
+import { cards, clubs, editions, players } from '../db/schema.js';
 import { getPacksConfig } from '../services/config.js';
 import { listPacks, oddsFor, openPack } from '../services/packs.js';
 import { getSquad, placeCard, setSquad } from '../services/squad.js';
@@ -46,10 +46,12 @@ export function cardRoutes(app: FastifyInstance, ctx: AppContext) {
         card: cards,
         player: { name: players.name, position: players.position, shirtNumber: players.shirtNumber },
         clubCode: clubs.code,
+        edition: { name: editions.name, supply: editions.supply },
       })
       .from(cards)
       .innerJoin(players, eq(players.id, cards.playerId))
       .leftJoin(clubs, eq(clubs.id, players.clubId))
+      .leftJoin(editions, eq(editions.id, cards.editionId))
       .where(and(eq(cards.userId, user.id)));
   });
 

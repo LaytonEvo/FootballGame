@@ -14,6 +14,7 @@ export const NOTIFICATION_KINDS = {
   recap_ready: true,
   card_changed: true,
   new_pack: true,
+  trade: true,
 } as const;
 export type NotificationKind = keyof typeof NOTIFICATION_KINDS;
 

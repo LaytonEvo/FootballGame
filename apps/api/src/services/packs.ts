@@ -18,6 +18,7 @@ import { badRequest, conflict, notFound } from '../errors.js';
 import { newId } from '../ids.js';
 import { getPacksConfig, SEASON } from './config.js';
 import { notify } from './notifications.js';
+import { openTeamOfTheWeekPack } from './editions.js';
 
 export type PackType = (typeof packs.$inferSelect)['type'];
 export type PackSource = (typeof packs.$inferSelect)['source'];
@@ -33,6 +34,8 @@ export interface PackCardResult {
   rating: number;
   duplicate: boolean;
   level: number;
+  /** Limited edition card: its edition and number, e.g. Team of the Week · GW11, #12 of 50. */
+  edition?: { name: string; serial: number; supply: number } | null;
 }
 
 /** Grant a sealed pack. Idempotent on grantKey: granting twice returns the first pack. */
@@ -44,22 +47,39 @@ export async function grantPack(
   source: PackSource,
   grantKey: string,
   rarity: Rarity | null = null,
+  opts: { gameweekId?: string } = {},
 ): Promise<{ pack: PackRow; created: boolean }> {
   const inserted = await db
     .insert(packs)
-    .values({ id: newId(), userId, type, source, grantKey, rarity, grantedAt: at })
+    .values({
+      id: newId(),
+      userId,
+      type,
+      source,
+      grantKey,
+      rarity,
+      grantedAt: at,
+      gameweekId: opts.gameweekId ?? null,
+    })
     .onConflictDoNothing({ target: packs.grantKey })
     .returning();
   if (inserted[0]) {
-    if (source === 'milestone' || source === 'compensation' || source === 'admin') {
+    if (
+      source === 'milestone' ||
+      source === 'compensation' ||
+      source === 'admin' ||
+      source === 'team_of_the_week'
+    ) {
       await notify(db, at, {
         userId,
         kind: 'new_pack',
         title: 'New pack ready',
         body:
-          source === 'milestone'
-            ? 'You reached a season milestone. Open your pack.'
-            : 'A free pack is waiting in your collection.',
+          source === 'team_of_the_week'
+            ? 'You finished in the top of the week: a limited Team of the Week card is waiting.'
+            : source === 'milestone'
+              ? 'You reached a season milestone. Open your pack.'
+              : 'A free pack is waiting in your collection.',
         data: { route: `/pack/${inserted[0].id}` },
         dedupeKey: `newpack:${inserted[0].id}`,
       });
@@ -84,6 +104,8 @@ export function oddsFor(
       return cfg.odds.player;
     case 'squad':
       return cfg.odds.squad;
+    case 'totw':
+      return {}; // one of that week's Team of the Week players, equal chance (see oddsNote)
     default:
       return cfg.odds[pack.type];
   }
@@ -237,6 +259,12 @@ export async function openPack(
     if (!pack) throw notFound('Pack');
     if (pack.status === 'opened') throw conflict('already_opened', 'This pack is already open');
     const cfg = await getPacksConfig(tx);
+    if (pack.type === 'totw') {
+      const res = await openTeamOfTheWeekPack(tx, at, userId, pack, seed >>> 0);
+      if (res) return res;
+      // Every edition card already issued: fall back to a Gold pack.
+      pack.type = 'gold';
+    }
     const plan = planPack(cfg, pack, await pool(tx, cfg), seed >>> 0);
     const owned = await tx
       .select()
@@ -322,7 +350,15 @@ export async function listPacks(db: DbOrTx, userId: string) {
     db.select().from(packs).where(eq(packs.userId, userId)),
     getPacksConfig(db),
   ]);
-  return rows.map((p) => ({ ...p, odds: oddsFor(cfg, p), oddsVersion: p.oddsVersion ?? cfg.version }));
+  return rows.map((p) => ({
+    ...p,
+    odds: oddsFor(cfg, p),
+    oddsVersion: p.oddsVersion ?? cfg.version,
+    oddsNote:
+      p.type === 'totw'
+        ? 'One of that week’s Team of the Week players, equal chance. Numbered and limited.'
+        : null,
+  }));
 }
 
 export const assertPackType = (t: string): PackType => {

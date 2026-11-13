@@ -7,6 +7,7 @@ import {
   queueRecapReady,
 } from '../services/live-notify.js';
 import { ingestMoves, processDueMoves } from '../services/moves.js';
+import { expireTrades } from '../services/trading.js';
 import { deliverNotifications, queueDeadlineReminders } from '../services/notifications.js';
 import { finaliseDueGameweeks, lockDueGameweeks, pollLiveGameweeks } from './gameweek.js';
 import { afterFinalise } from './hooks.js';
@@ -31,6 +32,7 @@ export async function tick(ctx: AppContext) {
     await afterFinalise(ctx, f);
     await queueRecapReady(ctx, f.gameweek, f.scored);
   }
+  await expireTrades(ctx);
   const delivered = await deliverNotifications(ctx);
   return { moves, locked, polled, finalised, delivered };
 }

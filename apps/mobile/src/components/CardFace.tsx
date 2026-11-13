@@ -2,6 +2,8 @@ import { Pressable, Text, View } from 'react-native';
 import type { Position, Rarity } from '@ff/shared';
 import { color, font, radius, rarityColor, type } from '../lib/theme';
 import { Shirt } from './Shirt';
+import { Gradient } from './Gradient';
+import type { CardEdition } from '../lib/types';
 
 /** "Benoît Badiashile Mukinayi" → "Badiashile Mukinayi" (small cards); full name on large ones. */
 const cardName = (full: string) => {
@@ -18,6 +20,7 @@ export function CardFace({
   size = 'lg',
   level,
   onPress,
+  edition,
 }: {
   name: string;
   position: Position;
@@ -27,6 +30,8 @@ export function CardFace({
   size?: 'lg' | 'sm';
   level?: number;
   onPress?: () => void;
+  /** Limited edition: gradient frame and its number, e.g. Team of the Week · GW11 · #12/50. */
+  edition?: CardEdition | null;
 }) {
   const lg = size === 'lg';
   const body = (
@@ -80,7 +85,26 @@ export function CardFace({
       </Text>
     </View>
   );
-  const label = `${name}, ${position}, ${clubCode ?? 'no club'}, ${rarity} card, rating ${rating}`;
+  const framed = edition ? (
+    <Gradient radius={radius.card + 3} style={{ padding: 4 }}>
+      {body}
+      <Text
+        style={{
+          textAlign: 'center',
+          color: '#FBFCFF',
+          fontFamily: font.bodyBold,
+          fontSize: lg ? 18 : 11,
+          paddingTop: 3,
+          maxWidth: lg ? 230 : 120,
+        }}
+      >
+        {edition.name.replace('Team of the Week', 'TOTW')} · #{edition.serial}/{edition.supply}
+      </Text>
+    </Gradient>
+  ) : (
+    body
+  );
+  const label = `${name}, ${position}, ${clubCode ?? 'no club'}, ${rarity} card, rating ${rating}${edition ? `, limited edition ${edition.name}, number ${edition.serial} of ${edition.supply}` : ''}`;
   return onPress ? (
     <Pressable
       onPress={onPress}
@@ -88,11 +112,11 @@ export function CardFace({
       accessibilityLabel={label}
       accessibilityHint="Opens the player profile"
     >
-      {body}
+      {framed}
     </Pressable>
   ) : (
     <View accessible accessibilityLabel={label}>
-      {body}
+      {framed}
     </View>
   );
 }

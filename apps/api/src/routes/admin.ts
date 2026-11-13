@@ -18,6 +18,7 @@ import {
   players,
   selections,
   sessions,
+  trades,
   users,
 } from '../db/schema.js';
 import { conflict, HttpError, notFound } from '../errors.js';
@@ -317,7 +318,7 @@ export function adminRoutes(app: FastifyInstance, ctx: AppContext) {
     const { id } = z.object({ id: z.string() }).parse(req.params);
     const [u] = await ctx.db.select().from(users).where(eq(users.id, id));
     if (!u) throw notFound('User');
-    const [ledgerRows, balance, cardRows, packRows, sels, scores] = await Promise.all([
+    const [ledgerRows, balance, cardRows, packRows, sels, tradeRows, scores] = await Promise.all([
       ctx.db.select().from(coinLedger).where(eq(coinLedger.userId, id)).orderBy(desc(coinLedger.id)),
       coinBalance(ctx.db, id),
       ctx.db
@@ -327,6 +328,11 @@ export function adminRoutes(app: FastifyInstance, ctx: AppContext) {
         .where(eq(cards.userId, id)),
       ctx.db.select().from(packs).where(eq(packs.userId, id)).orderBy(desc(packs.grantedAt)),
       ctx.db.select().from(selections).where(eq(selections.userId, id)),
+      ctx.db
+        .select()
+        .from(trades)
+        .where(or(eq(trades.fromUserId, id), eq(trades.toUserId, id)))
+        .orderBy(desc(trades.createdAt)),
       ctx.db
         .select({ s: gameweekScores, number: gameweeks.number })
         .from(gameweekScores)
@@ -343,6 +349,7 @@ export function adminRoutes(app: FastifyInstance, ctx: AppContext) {
       cards: cardRows,
       packs: packRows,
       selections: sels,
+      trades: tradeRows,
       scores: scores.map((r) => ({ gameweek: r.number, ...r.s })),
     };
   });

@@ -189,6 +189,23 @@ One short note per phase. Assumptions that need a product decision are collected
 - Player profiles, one-at-a-time pack reveals, and packs only dealing players getting minutes (≥180 over the
   last 6 played gameweeks, `config/packs` → `pool`).
 
+## Earned scarcity and card-for-card trading (economy v0.2)
+
+- **Team of the Week limited editions:** when a gameweek is final, its best GK, DEF, two MIDs and FWD
+  (position-aware performance score from the stats) become an edition of 50 numbered cards each. The top 10%
+  of that week's players (ties included) get a sealed Team of the Week pack: one numbered card, equal chance
+  among that week's players with supply left, never a duplicate edition; supply is enforced atomically, and an
+  exhausted edition falls back to a Gold pack. Editions are **earned only, never sold**, and keep the player's
+  normal rarity multiplier (status, not points).
+- **Trading:** one card for one card, only between players who share a mini-league, accounts 7+ days old,
+  max 5 trades a week, offers expire after 48 hours, one open offer per card. Accepting re-checks everything in
+  a transaction, swaps owners, takes both cards out of squads (auto-filled) and cancels clashing offers. No
+  Coins, money or one-way gifts, so cards never carry a real-money value. Push on offer and on acceptance.
+- Mobile: numbered edition frame on cards, Trades screen (incoming / outgoing / history), offer flow from any
+  card in the Collection. Staff console shows each user's trades and edition numbers.
+- Rules live in `config/economy.v0.2.json` (`editions`, `trading`); v0.1 has neither, so both switch on when
+  staff activate economy v0.2.
+
 ## Before the closed test (not code)
 
 - Product decisions: game name, chaos actions at launch, milestone levels (economy check proposes

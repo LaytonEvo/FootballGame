@@ -37,7 +37,7 @@ export async function verifySignIn(ctx: AppContext, rawPhone: string, code: stri
   if (!user) {
     [user] = await ctx.db
       .insert(users)
-      .values({ id: newId(), phoneHash, inviteCode: shortCode(8) })
+      .values({ id: newId(), phoneHash, inviteCode: shortCode(8), createdAt: now })
       .returning();
   }
   const token = randomBytes(32).toString('base64url');
@@ -122,7 +122,7 @@ export async function guestSignIn(ctx: AppContext) {
   const now = ctx.clock.now();
   const [user] = await ctx.db
     .insert(users)
-    .values({ id: newId(), phoneHash: `guest:${newId()}`, inviteCode: shortCode(8) })
+    .values({ id: newId(), phoneHash: `guest:${newId()}`, inviteCode: shortCode(8), createdAt: now })
     .returning();
   const token = randomBytes(32).toString('base64url');
   await ctx.db.insert(sessions).values({

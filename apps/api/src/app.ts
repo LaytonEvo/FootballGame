@@ -16,6 +16,7 @@ import './services/recap-hooks.js';
 import { rewardRoutes } from './routes/rewards.js';
 import { recapRoutes } from './routes/recap.js';
 import { adminRoutes } from './routes/admin.js';
+import { tradeRoutes } from './routes/trades.js';
 import { leagueRoutes } from './routes/leagues.js';
 
 export async function buildApp(ctx: AppContext) {
@@ -50,5 +51,6 @@ export async function buildApp(ctx: AppContext) {
   rewardRoutes(app, ctx);
   recapRoutes(app, ctx);
   adminRoutes(app, ctx);
+  tradeRoutes(app, ctx);
   return app;
 }

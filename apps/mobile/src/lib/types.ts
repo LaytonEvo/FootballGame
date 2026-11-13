@@ -51,7 +51,38 @@ export interface PackCard {
   rating: number;
   duplicate: boolean;
   level: number;
+  edition?: CardEdition | null;
 }
+
+/** A limited, numbered edition card (earned only). */
+export interface CardEdition {
+  name: string;
+  serial: number;
+  supply: number;
+}
+
+/** A card as GET /cards and the trade endpoints return it. */
+export interface OwnedCard {
+  card: {
+    id: string;
+    userId?: string;
+    playerId: string;
+    rarity: Rarity;
+    rating: number;
+    level: number;
+    active: boolean;
+    inactiveReason: string | null;
+    serial: number | null;
+  };
+  player: { name: string; position: Position };
+  clubCode: string | null;
+  edition: { name: string; supply: number } | null;
+}
+
+export const editionOf = (c: OwnedCard): CardEdition | null =>
+  c.edition && c.card.serial
+    ? { name: c.edition.name, serial: c.card.serial, supply: c.edition.supply }
+    : null;
 export interface Pack {
   id: string;
   type: string;
@@ -61,6 +92,7 @@ export interface Pack {
   grantedAt: string;
   odds: Partial<Record<Rarity, number>>;
   oddsVersion: string;
+  oddsNote?: string | null;
 }
 export interface SquadCard {
   slot: number;

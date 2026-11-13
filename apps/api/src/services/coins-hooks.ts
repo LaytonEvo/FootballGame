@@ -1,6 +1,7 @@
 import { onFinalise } from '../jobs/hooks.js';
 import { creditGameweekCoins, coinBalance, grantMilestones } from './coins.js';
 import { getEconomy } from './config.js';
+import { runTeamOfTheWeek } from './editions.js';
 import { registerHomeExtra } from './home.js';
 
 onFinalise(async (ctx, f) => {
@@ -10,6 +11,8 @@ onFinalise(async (ctx, f) => {
     f.scored.map((s) => s.userId),
     f.gameweek.season,
   );
+  // Earned limited editions: Team of the Week (economy v0.2+).
+  await runTeamOfTheWeek(ctx, f.gameweek.id);
 });
 
 registerHomeExtra(async (ctx, userId) => {

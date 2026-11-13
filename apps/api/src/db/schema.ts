@@ -180,12 +180,25 @@ export const packs = pgTable(
     userId: text('user_id')
       .notNull()
       .references(() => users.id),
-    type: text('type', { enum: ['starter', 'player', 'swap', 'squad', 'silver', 'gold', 'elite'] }).notNull(),
+    type: text('type', {
+      enum: ['starter', 'player', 'swap', 'squad', 'silver', 'gold', 'elite', 'totw'],
+    }).notNull(),
     source: text('source', {
-      enum: ['signup', 'coins', 'weekly_free', 'milestone', 'swap', 'compensation', 'admin'],
+      enum: [
+        'signup',
+        'coins',
+        'weekly_free',
+        'milestone',
+        'swap',
+        'compensation',
+        'admin',
+        'team_of_the_week',
+      ],
     }).notNull(),
     /** Swap and compensation packs are fixed to a rarity. */
     rarity: text('rarity', { enum: ['bronze', 'silver', 'gold', 'elite'] }),
+    /** Team of the Week packs draw from that gameweek's editions. */
+    gameweekId: text('gameweek_id'),
     status: text('status', { enum: ['sealed', 'opened'] })
       .notNull()
       .default('sealed'),
@@ -218,6 +231,9 @@ export const cards = pgTable(
     inactiveReason: text('inactive_reason'),
     packId: text('pack_id').references(() => packs.id),
     swappedAt: ts('swapped_at'),
+    /** Limited edition this card belongs to, and its number within the edition (e.g. #12 of 50). */
+    editionId: text('edition_id'),
+    serial: integer('serial'),
     createdAt: createdAt(),
   },
   (t) => [index('cards_user').on(t.userId), index('cards_player').on(t.playerId)],
@@ -371,3 +387,54 @@ export const adminAudit = pgTable('admin_audit', {
   payload: jsonb('payload').notNull(),
   at: ts('at').notNull(),
 });
+
+/**
+ * Limited editions: a fixed number of numbered cards, earned only (never sold). Team of the Week = the best
+ * performers of a finalised gameweek; supply is capped per player.
+ */
+export const editions = pgTable(
+  'editions',
+  {
+    id: id(),
+    kind: text('kind', { enum: ['team_of_the_week'] }).notNull(),
+    name: text('name').notNull(),
+    gameweekId: text('gameweek_id')
+      .notNull()
+      .references(() => gameweeks.id),
+    playerId: text('player_id')
+      .notNull()
+      .references(() => players.id),
+    supply: integer('supply').notNull(),
+    issued: integer('issued').notNull().default(0),
+    createdAt: createdAt(),
+  },
+  (t) => [uniqueIndex('editions_kind_gw_player').on(t.kind, t.gameweekId, t.playerId)],
+);
+
+/** Card-for-card trade offers between players. No Coins or money ever change hands. */
+export const trades = pgTable(
+  'trades',
+  {
+    id: id(),
+    fromUserId: text('from_user_id')
+      .notNull()
+      .references(() => users.id),
+    toUserId: text('to_user_id')
+      .notNull()
+      .references(() => users.id),
+    offeredCardId: text('offered_card_id')
+      .notNull()
+      .references(() => cards.id),
+    requestedCardId: text('requested_card_id')
+      .notNull()
+      .references(() => cards.id),
+    status: text('status', { enum: ['open', 'accepted', 'declined', 'cancelled', 'expired'] })
+      .notNull()
+      .default('open'),
+    reason: text('reason'),
+    createdAt: ts('created_at').notNull(),
+    expiresAt: ts('expires_at').notNull(),
+    respondedAt: ts('responded_at'),
+  },
+  (t) => [index('trades_from').on(t.fromUserId), index('trades_to').on(t.toUserId)],
+);

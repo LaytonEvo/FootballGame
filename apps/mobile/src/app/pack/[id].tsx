@@ -26,6 +26,7 @@ const TITLE: Record<string, string> = {
   silver: 'Silver pack',
   gold: 'Gold pack',
   elite: 'Elite pack',
+  totw: 'Team of the Week pack',
 };
 const SLOT_FOR: Record<string, number[]> = { GK: [0], DEF: [1], MID: [2, 3], FWD: [4] };
 
@@ -157,7 +158,9 @@ export default function PackScreen() {
   const many = cards.length > 1;
   const title = TITLE[pack?.type ?? 'player'];
   const label = (c: PackCard) =>
-    `${c.rarity.toUpperCase()} · ${c.duplicate ? `DUPLICATE · LEVEL ${c.level}` : 'NEW CARD'}`;
+    c.edition
+      ? `LIMITED EDITION · #${c.edition.serial} OF ${c.edition.supply}`
+      : `${c.rarity.toUpperCase()} · ${c.duplicate ? `DUPLICATE · LEVEL ${c.level}` : 'NEW CARD'}`;
 
   return (
     <Screen>
@@ -175,10 +178,11 @@ export default function PackScreen() {
       </View>
       {pack ? (
         <Small>
-          Odds (v{pack.oddsVersion}):{' '}
-          {Object.entries(pack.odds)
-            .map(([r, p]) => `${r} ${Math.round((p ?? 0) * 1000) / 10}%`)
-            .join(' · ')}
+          {pack.oddsNote
+            ? pack.oddsNote
+            : `Odds (v${pack.oddsVersion}): ${Object.entries(pack.odds)
+                .map(([r, p]) => `${r} ${Math.round((p ?? 0) * 1000) / 10}%`)
+                .join(' · ')}`}
         </Small>
       ) : null}
 

@@ -417,9 +417,19 @@ interface UserDetail {
       level: number;
       active: boolean;
       inactiveReason: string | null;
+      serial: number | null;
     };
     name: string;
     position: string;
+  }[];
+  trades: {
+    id: string;
+    fromUserId: string;
+    toUserId: string;
+    offeredCardId: string;
+    requestedCardId: string;
+    status: string;
+    createdAt: string;
   }[];
   scores: {
     gameweek: number;
@@ -548,6 +558,25 @@ function Users() {
             ))}
           </section>
           <section>
+            <h2>Trades</h2>
+            {d.trades.length === 0 ? <p className="muted">No trades.</p> : null}
+            <table>
+              <tbody>
+                {d.trades.map((t) => (
+                  <tr key={t.id}>
+                    <td>{new Date(t.createdAt).toLocaleString('en-GB')}</td>
+                    <td>{t.fromUserId === d.profile.id ? 'Offered' : 'Received'}</td>
+                    <td>
+                      <code>{t.offeredCardId.slice(0, 8)}</code> ⇄{' '}
+                      <code>{t.requestedCardId.slice(0, 8)}</code>
+                    </td>
+                    <td>{t.status}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+          <section>
             <h2>Cards</h2>
             <table>
               <tbody>
@@ -576,7 +605,10 @@ function Users() {
                         {c.card.rating}
                       </button>
                     </td>
-                    <td>Lv {c.card.level}</td>
+                    <td>
+                      Lv {c.card.level}
+                      {c.card.serial ? ` · limited #${c.card.serial}` : ''}
+                    </td>
                     <td>{c.card.active ? 'active' : `inactive (${c.card.inactiveReason})`}</td>
                   </tr>
                 ))}

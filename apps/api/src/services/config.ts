@@ -137,5 +137,7 @@ export async function seedConfigs(db: DbOrTx) {
   // v0.3 adds the substitute fallbacks. Loaded but not auto-activated: staff switch versions in the console.
   await upsertConfigVersion(db, 'scoring', readConfigFile('scoring.v0.3.json'));
   await upsertConfigVersion(db, 'economy', readConfigFile('economy.v0.1.json'));
+  // v0.2 adds earned limited editions and card-for-card trading (activate from the staff console).
+  await upsertConfigVersion(db, 'economy', readConfigFile('economy.v0.2.json'));
   await upsertConfigVersion(db, 'packs', readConfigFile('packs.v0.1.json'));
 }

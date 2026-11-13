@@ -79,6 +79,27 @@ export const economyConfigSchema = z.object({
   compensation: z.record(z.string(), z.string()),
   pack_odds: z.unknown(),
   never: z.array(z.string()),
+  /** v0.2+: earned limited editions (never sold). */
+  editions: z
+    .object({
+      team_of_the_week: z.object({
+        comment: z.string().optional(),
+        supply_per_player: z.number().int().positive(),
+        award_top_percent: z.number().min(0).max(100),
+      }),
+    })
+    .optional(),
+  /** v0.2+: card-for-card trading. Off when absent. */
+  trading: z
+    .object({
+      comment: z.string().optional(),
+      enabled: z.boolean(),
+      same_league_required: z.boolean(),
+      min_account_age_days: z.number().int().min(0),
+      max_trades_per_week: z.number().int().min(0),
+      offer_expiry_hours: z.number().int().positive(),
+    })
+    .optional(),
 });
 
 export type EconomyConfig = z.infer<typeof economyConfigSchema>;

@@ -24,6 +24,8 @@ export type EventName =
   | 'recap_viewed'
   | 'recap_shared'
   | 'coins_spent'
+  | 'trade_offered'
+  | 'trade_accepted'
   | 'notification_sent';
 
 export async function track(
