@@ -141,3 +141,43 @@ describe('2026/27 public dataset provider', () => {
     );
   });
 });
+
+describe('form and warnings skip gameweeks still waiting for stats', () => {
+  it('a gameweek with no results yet does not count as 0 minutes', async () => {
+    const t = await testCtx('2026-08-10T12:00:00Z');
+    const state = { gw1Finished: true, withStats: false } as Parameters<typeof files>[0];
+    const provider = new FplSeasonProvider(t.clock, 'https://example.test/2026-27', (u) => files(state)(u));
+    const ctx = {
+      db: t.db,
+      clock: t.clock,
+      provider,
+      otp: new LocalOtpService(t.db, t.clock),
+      push: new MemoryPushSender(),
+    };
+    await syncReferenceData(ctx);
+    const [gw1] = await t.db.select().from(gameweeks).where(eq(gameweeks.number, 1));
+    t.clock.set(new Date(gw1!.finaliseAt.getTime() + HOUR));
+    await tick(ctx); // GW1 locked and waiting: no stats
+    const { pickScreen } = await import('../src/services/picks.js');
+    const { cards, squadSlots, users } = await import('../src/db/schema.js');
+    const ps = await t.db.select().from(players);
+    const uid = 'u-season';
+    await t.db.insert(users).values({ id: uid, phoneHash: 'h', inviteCode: 'SEASON01' });
+    const shape = ['GK', 'DEF', 'MID', 'MID', 'FWD'];
+    const used = new Set<string>();
+    for (const [slot, pos] of shape.entries()) {
+      const p = ps.find(
+        (x) => x.position === pos && x.clubId && !used.has(x.id) && x.name !== 'William Saliba',
+      )!;
+      used.add(p.id);
+      await t.db
+        .insert(cards)
+        .values({ id: `c${slot}`, userId: uid, playerId: p.id, rarity: 'bronze', rating: p.rating });
+      await t.db.insert(squadSlots).values({ userId: uid, slot, cardId: `c${slot}` });
+    }
+    const screen = await pickScreen(ctx, uid);
+    expect(screen.gameweek.number).toBe(2);
+    expect(screen.slots.map((s) => s.warning)).toEqual([null, null, null, null, null]);
+    await t.close();
+  });
+});

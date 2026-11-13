@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, inArray, lt } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, lt } from 'drizzle-orm';
 import type { PlayerMatchStats } from '@ff/shared';
 import { TIER_LABEL } from '@ff/shared';
 import type { Selection } from '@ff/scoring';
@@ -98,17 +98,15 @@ async function fixtureContext(db: DbOrTx, gw: Gameweek) {
 /** Last five finished gameweeks of stats per player, most recent first. */
 async function recentStats(db: DbOrTx, gw: Gameweek, playerIds: string[]) {
   if (playerIds.length === 0) return new Map<string, PlayerMatchStats[][]>();
+  // Only gameweeks whose stats have arrived: a feed that lags must not read as "0 minutes".
   const prev = await db
-    .select({ id: gameweeks.id, number: gameweeks.number })
+    .selectDistinct({ id: gameweeks.id, number: gameweeks.number })
     .from(gameweeks)
-    .where(
-      and(
-        eq(gameweeks.season, gw.season),
-        lt(gameweeks.number, gw.number),
-        gte(gameweeks.number, gw.number - 5),
-      ),
-    )
-    .orderBy(desc(gameweeks.number));
+    .innerJoin(fixtures, eq(fixtures.gameweekId, gameweeks.id))
+    .innerJoin(playerMatchStats, eq(playerMatchStats.fixtureId, fixtures.id))
+    .where(and(eq(gameweeks.season, gw.season), lt(gameweeks.number, gw.number)))
+    .orderBy(desc(gameweeks.number))
+    .limit(5);
   if (prev.length === 0) return new Map();
   const rows = await db
     .select({ s: playerMatchStats, gwId: fixtures.gameweekId })
