@@ -52,7 +52,11 @@ export default function NewTrade() {
         </Pressable>
         <H1>Offer a trade</H1>
       </View>
-      {give ? <TradePair give={give} get={want} /> : <Small>That card isn’t in your collection.</Small>}
+      {give ? (
+        <TradePair give={give} get={want} emptyLabel="Pick a card" />
+      ) : (
+        <Small>That card isn’t in your collection.</Small>
+      )}
 
       <H3>1 · Who with?</H3>
       {partners.data.length === 0 ? (
@@ -91,6 +95,9 @@ export default function NewTrade() {
         <>
           <H3>2 · Which of {partner.name}’s cards?</H3>
           {!theirs.data ? <Loading /> : null}
+          {theirs.data && theirs.data.length === 0 ? (
+            <Small>{partner.name} has no cards to trade yet. Try another league-mate.</Small>
+          ) : null}
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
             {(theirs.data ?? []).map((c) => (
               <View

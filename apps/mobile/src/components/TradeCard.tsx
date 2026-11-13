@@ -5,7 +5,16 @@ import { color, font } from '../lib/theme';
 import { CardFace } from './CardFace';
 
 /** "You give → you get" pair of small cards for a trade offer. */
-export function TradePair({ give, get }: { give: OwnedCard | null; get: OwnedCard | null }) {
+export function TradePair({
+  give,
+  get,
+  emptyLabel = 'Card gone',
+}: {
+  give: OwnedCard | null;
+  get: OwnedCard | null;
+  /** Shown in place of a missing card: "Card gone" in history, "Pick a card" while building an offer. */
+  emptyLabel?: string;
+}) {
   const face = (c: OwnedCard | null, label: string) => (
     <View style={{ alignItems: 'center', gap: 4 }}>
       <Text style={{ fontFamily: font.bodyBold, fontSize: 12, color: color.muted, letterSpacing: 1 }}>
@@ -23,7 +32,7 @@ export function TradePair({ give, get }: { give: OwnedCard | null; get: OwnedCar
           size="sm"
         />
       ) : (
-        <Text style={{ color: color.muted }}>Card gone</Text>
+        <Text style={{ color: color.muted }}>{emptyLabel}</Text>
       )}
     </View>
   );
