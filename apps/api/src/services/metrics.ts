@@ -123,7 +123,7 @@ export async function computeMetrics(ctx: AppContext): Promise<MetricsReport> {
     display: m1 === null ? '–' : fmtDuration(m1),
     status: m1 === null ? 'no_data' : m1 < 2 * 60 * 1000 ? 'met' : 'not_met',
     sample: toFirst.length,
-    note: `Account created → first confirm. ${pct(toFirst.filter((x) => x < 120_000).length, toFirst.length)}% under 2 min.`,
+    note: `Account created → first confirm.${toFirst.length ? ` ${pct(toFirst.filter((x) => x < 120_000).length, toFirst.length)}% under 2 min.` : ''}`,
   });
 
   // 2. Time to pick weekly actions (returning players)
@@ -139,7 +139,7 @@ export async function computeMetrics(ctx: AppContext): Promise<MetricsReport> {
     display: m2 === null ? '–' : fmtDuration(m2),
     status: m2 === null ? 'no_data' : m2 < 60_000 ? 'met' : 'not_met',
     sample: returningPicks.length,
-    note: `First open of the picks screen → confirm, for players who also played an earlier gameweek. ${pct(returningPicks.filter((c) => c.pickMs! < 60_000).length, returningPicks.length)}% under 60s.`,
+    note: `First open of the picks screen → confirm, for players who also played an earlier gameweek.${returningPicks.length ? ` ${pct(returningPicks.filter((c) => c.pickMs! < 60_000).length, returningPicks.length)}% under 60s.` : ''}`,
   });
 
   // 3. Gameweek retention
