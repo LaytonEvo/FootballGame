@@ -28,6 +28,7 @@ import { activateConfigVersion, upsertConfigVersion } from '../services/config.j
 import { queueCardChanges } from '../services/live-notify.js';
 import { processDueMoves, promoteClub, recordMove, relegateClub } from '../services/moves.js';
 import { hashPhone, normalisePhone } from '../services/phone.js';
+import { computeMetrics } from '../services/metrics.js';
 import { scoreGameweek } from '../services/scoring.js';
 import { rerateAllPlayers } from '../services/ingest.js';
 
@@ -223,6 +224,12 @@ export function adminRoutes(app: FastifyInstance, ctx: AppContext) {
     await promoteClub(ctx, id);
     await audit(staff, 'club.promote', { clubId: id });
     return { ok: true };
+  });
+
+  // ---------- test metrics ----------
+  app.get('/admin/metrics', async (req) => {
+    await guard(req);
+    return computeMetrics(ctx);
   });
 
   // ---------- config versions ----------

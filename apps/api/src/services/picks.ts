@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, lt } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, inArray, lt, sql } from 'drizzle-orm';
 import type { PlayerMatchStats } from '@ff/shared';
 import { TIER_LABEL } from '@ff/shared';
 import type { Selection } from '@ff/scoring';
@@ -342,18 +342,36 @@ export async function confirmSelection(
       'weekly_free',
       `weekly:${userId}:${gameweekId}`,
     );
-    const [started] = await tx
-      .select()
+    // Pick time runs from the first time the picks screen opened for this gameweek since the
+    // previous confirm (screen reloads after each edit must not restart the clock).
+    const [prev] = await tx
+      .select({ at: analyticsEvents.at })
       .from(analyticsEvents)
-      .where(and(eq(analyticsEvents.userId, userId), eq(analyticsEvents.name, 'pick_started')))
+      .where(
+        and(
+          eq(analyticsEvents.userId, userId),
+          eq(analyticsEvents.name, 'actions_confirmed'),
+          sql`${analyticsEvents.props}->>'gameweek' = ${String(gw.number)}`,
+        ),
+      )
       .orderBy(desc(analyticsEvents.at))
+      .limit(1);
+    const [started] = await tx
+      .select({ at: analyticsEvents.at })
+      .from(analyticsEvents)
+      .where(
+        and(
+          eq(analyticsEvents.userId, userId),
+          eq(analyticsEvents.name, 'pick_started'),
+          sql`${analyticsEvents.props}->>'gameweekId' = ${gameweekId}`,
+          ...(prev ? [gt(analyticsEvents.at, prev.at)] : []),
+        ),
+      )
+      .orderBy(asc(analyticsEvents.at))
       .limit(1);
     await track(tx, now, userId, 'actions_confirmed', {
       gameweek: gw.number,
-      pickMs:
-        started && (started.props as { gameweekId?: string }).gameweekId === gameweekId
-          ? now.getTime() - started.at.getTime()
-          : null,
+      pickMs: started ? now.getTime() - started.at.getTime() : null,
     });
     return {
       confirmedAt: now,

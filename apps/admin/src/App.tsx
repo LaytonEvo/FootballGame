@@ -2,8 +2,9 @@ import { useCallback, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { admin, getToken, setToken } from './api';
 
-type Tab = 'gameweeks' | 'players' | 'clubs' | 'users' | 'packs' | 'config' | 'audit';
+type Tab = 'metrics' | 'gameweeks' | 'players' | 'clubs' | 'users' | 'packs' | 'config' | 'audit';
 const TABS: { id: Tab; label: string }[] = [
+  { id: 'metrics', label: 'Test metrics' },
   { id: 'gameweeks', label: 'Gameweeks & matches' },
   { id: 'players', label: 'Players & transfers' },
   { id: 'clubs', label: 'Clubs' },
@@ -65,6 +66,122 @@ interface Fixture {
   homeScore: number | null;
   awayScore: number | null;
   voided: boolean;
+}
+
+interface Metric {
+  key: string;
+  label: string;
+  target: string;
+  value: number | null;
+  display: string;
+  status: 'met' | 'not_met' | 'no_data';
+  sample: number;
+  note: string;
+}
+interface MetricsReport {
+  generatedAt: string;
+  activeWindowDays: number;
+  activePlayers: number;
+  metrics: Metric[];
+  funnel: { step: string; users: number }[];
+  retention: { gameweek: number; week: number; active: number; percent: number }[];
+  weekly: { gameweek: number; players: number; medianPickSeconds: number | null; shares: number }[];
+}
+const STATUS_TEXT = { met: 'On target', not_met: 'Below target', no_data: 'Not enough data' } as const;
+
+function Metrics() {
+  const r = useLoad<MetricsReport>('/admin/metrics');
+  const m = r.data;
+  if (r.err) return <p className="err">{r.err}</p>;
+  if (!m) return <p className="muted">Loading…</p>;
+  const top = Math.max(1, ...m.funnel.map((f) => f.users));
+  return (
+    <>
+      <section>
+        <div className="row" style={{ justifyContent: 'space-between' }}>
+          <h2 style={{ margin: 0 }}>Closed-test metrics</h2>
+          <div className="row">
+            <span className="muted">
+              {m.activePlayers} active players (confirmed actions in the last {m.activeWindowDays} days) ·
+              updated {new Date(m.generatedAt).toLocaleString('en-GB')}
+            </span>
+            <button className="act secondary" onClick={() => void r.reload()}>
+              Refresh
+            </button>
+          </div>
+        </div>
+        <div className="tiles">
+          {m.metrics.map((x) => (
+            <div key={x.key} className={`tile ${x.status}`}>
+              <div className="tile-label">{x.label}</div>
+              <div className="tile-value">{x.display}</div>
+              <div className="tile-target">Target: {x.target}</div>
+              <span className={`pill ${x.status}`}>{STATUS_TEXT[x.status]}</span>
+              <p className="muted">
+                {x.note} {x.sample ? `Sample: ${x.sample}.` : ''}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+      <div className="two">
+        <section>
+          <h2>Funnel</h2>
+          {m.funnel.map((f) => (
+            <div key={f.step} className="bar-row">
+              <span>{f.step}</span>
+              <div className="bar">
+                <div style={{ width: `${(f.users / top) * 100}%` }} />
+              </div>
+              <strong>{f.users}</strong>
+            </div>
+          ))}
+        </section>
+        <section>
+          <h2>Week-1 cohort retention</h2>
+          {m.retention.length === 0 ? (
+            <p className="muted">No gameweek played yet.</p>
+          ) : (
+            <div className="retention" role="img" aria-label="Retention by week, target 60% at week 8">
+              {m.retention.map((x) => (
+                <div key={x.week} className="col" title={`GW${x.gameweek}: ${x.active} players`}>
+                  <span>{x.percent}%</span>
+                  <div className="track">
+                    <div className={x.week === 8 ? 'fill wk8' : 'fill'} style={{ height: `${x.percent}%` }} />
+                  </div>
+                  <small>W{x.week}</small>
+                </div>
+              ))}
+            </div>
+          )}
+          <p className="muted">Dashed line: 60% target. Week 8 is highlighted.</p>
+        </section>
+      </div>
+      <section>
+        <h2>By gameweek</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Gameweek</th>
+              <th>Players who confirmed</th>
+              <th>Median pick time</th>
+              <th>Recap shares</th>
+            </tr>
+          </thead>
+          <tbody>
+            {m.weekly.map((w) => (
+              <tr key={w.gameweek}>
+                <td>GW{w.gameweek}</td>
+                <td>{w.players}</td>
+                <td>{w.medianPickSeconds === null ? '–' : `${w.medianPickSeconds}s`}</td>
+                <td>{w.shares}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+    </>
+  );
 }
 
 function Gameweeks() {
@@ -805,7 +922,7 @@ function Audit() {
 }
 
 export function App() {
-  const [tab, setTab] = useState<Tab>('gameweeks');
+  const [tab, setTab] = useState<Tab>('metrics');
   const [token, setTok] = useState(getToken());
   if (!token) {
     return (
@@ -839,7 +956,9 @@ export function App() {
         ))}
       </header>
       <main>
-        {tab === 'gameweeks' ? (
+        {tab === 'metrics' ? (
+          <Metrics />
+        ) : tab === 'gameweeks' ? (
           <Gameweeks />
         ) : tab === 'players' ? (
           <Players />

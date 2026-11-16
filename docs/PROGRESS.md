@@ -232,3 +232,7 @@ One short note per phase. Assumptions that need a product decision are collected
 | A9  | Negative weeks                           | Season Points can go negative (bold misses); Coins earned are floored at 0 per week                                           | ledger              |
 
 **Economy v0.3 (closed test).** Same as v0.2 but `trading.min_account_age_days` is 0 so new testers can trade straight away. Active on live. Switch back to v0.2 (7 days) before any wider release.
+
+## Test metrics dashboard
+
+Staff console → **Test metrics** (first tab), backed by `GET /admin/metrics` (`apps/api/src/services/metrics.ts`). Shows the six CLAUDE.md test metrics against their targets, a sign-up → active funnel, week-1 cohort retention and a per-gameweek table. Definitions: active = confirmed actions in the last 28 days; install = account creation; week 1 = the first gameweek anyone confirmed in; pick time = first open of the picks screen for that gameweek → confirm (screen reloads no longer restart the timer), returning players only. Covered by `apps/api/test/metrics.test.ts`.
